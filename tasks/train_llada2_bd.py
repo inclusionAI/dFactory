@@ -48,12 +48,12 @@ class LLaDA2ModelArguments(ModelArguments):
 
 @dataclass
 class LLaDA2DataArguments(DataArguments):
-    data_type: Literal["plaintext", "conversation", "diffusion", "tokenid"] = field(
-        default="tokenid",
+    data_type: Literal["conversation", "tokenid"] = field(
+        default="conversation",
         metadata={"help": "Type of the training data."},
     )
-    datasets_type: Literal["mapping", "iterable", "numpy", "ling", "local_nexus"] = field(
-        default="local_nexus",
+    datasets_type: Literal["mapping", "local"] = field(
+        default="mapping",
         metadata={"help": "Type of the datasets."},
     )
     text_keys: str = field(
