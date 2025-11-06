@@ -57,7 +57,7 @@ class LLaDA2DataArguments(DataArguments):
         metadata={"help": "Type of the datasets."},
     )
     text_keys: str = field(
-        default="input_ids",
+        default="messages",
         metadata={"help": "Key to get text from the training data."},
     )
     noise_range_low: float = field(
