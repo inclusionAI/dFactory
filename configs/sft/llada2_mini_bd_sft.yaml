@@ -1,0 +1,59 @@
+model:
+  config_path: ./configs/model_configs/llada2_mini
+  model_path: ./LLaDA2.0-mini-preview-moe-merge
+  tokenizer_path: ./LLaDA2.0-mini-preview-moe-merge
+  attn_implementation: sdpa
+  moe_implementation: fused
+
+data:
+  train_path: ./gsm8k_datasets/gsm8k_train.jsonl
+  data_type: conversation
+  datasets_type: mapping
+  dataloader_type: native
+  max_seq_len: 2048
+  text_keys: messages
+  noise_range_low: 0.3
+  noise_range_high: 0.8
+  num_workers: 16
+
+train:
+  output_dir: ./llada2_mini_bd_sft_outputs
+  data_parallel_mode: fsdp2
+  tensor_parallel_size: 1
+  ulysses_parallel_size: 1
+  expert_parallel_size: 1
+  global_batch_size: 8
+  micro_batch_size: 1
+  num_train_epochs: 1
+  rmpad: false
+  rmpad_with_pos_ids: false
+  bsz_warmup_ratio: 0.007
+  dyn_bsz_margin: 0
+  dyn_bsz_buffer_size: 200
+  optimizer: adamw
+  beta1: 0.9
+  beta2: 0.999
+  lr: 1.0e-5
+  lr_warmup_ratio: 0.03
+  lr_decay_style: cosine
+  lr_decay_ratio: 1.0
+  weight_decay: 0.1
+  max_grad_norm: 1.0
+  enable_mixed_precision: true
+  enable_gradient_checkpointing: true
+  enable_full_shard: true
+  enable_fsdp_offload: true
+  enable_activation_offload: false
+  init_device: meta
+  broadcast_model_weights_from_rank0: true
+  enable_full_determinism: false
+  empty_cache_steps: 500
+  ckpt_manager: dcp
+  load_checkpoint_path: ""
+  save_epochs: 1
+  save_hf_weights: true
+  block_diffusion_mode: true
+  block_size: 32
+  same_token_labels: true
+  use_wandb: false  # or you can set `wandb_project` and `wandb_name` to trace your training
+  log_steps: 1
