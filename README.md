@@ -1,3 +1,17 @@
+<div align="center">
+  <img src="https://mdn.alipayobjects.com/huamei_qa8qxu/afts/img/A*9yAZT61NXRkAAAAARBAAAAgAemJ7AQ/original" width="40%" alt="dFactory" />
+</div>
+
+<h4 align="center">
+
+[![License: MIT](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](./LICENSE)
+[![HuggingFace: Models](https://img.shields.io/badge/HuggingFace-Models-yellow)](https://huggingface.co/inclusionAI/LLaDA2.0-mini-preview))
+
+<!-- [![arXiv][arxiv-image]][arxiv-url] -->
+
+</h4>
+
+
 # dFactory: Easy and Efficient dLLM Fine-Tuning
 
 ## Features
