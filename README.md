@@ -5,7 +5,7 @@
 <h4 align="center">
 
 [![License: MIT](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](./LICENSE)
-[![HuggingFace: Models](https://img.shields.io/badge/HuggingFace-Models-yellow)](https://huggingface.co/inclusionAI/LLaDA2.0-mini-preview))
+[![HuggingFace: Models](https://img.shields.io/badge/HuggingFace-Models-yellow)](https://huggingface.co/inclusionAI/LLaDA2.0-mini-preview)
 
 <!-- [![arXiv][arxiv-image]][arxiv-url] -->
 
