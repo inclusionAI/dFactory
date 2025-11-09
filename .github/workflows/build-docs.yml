@@ -1,0 +1,28 @@
+name: Build Documents
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+    paths:
+      - ".github/workflows/build-docs.yml"
+      - "docs/**"
+  workflow_dispatch:  # Allows to trigger the workflow manually in GitHub UI
+
+jobs:
+  run:
+    name: "build docs"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # See <https://github.com/mkdocs/mkdocs/issues/2370#issuecomment-821926264>
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Build HTML
+        uses: ammaraskar/sphinx-action@8.2.3
+        with:
+          docs-folder: "docs/"
