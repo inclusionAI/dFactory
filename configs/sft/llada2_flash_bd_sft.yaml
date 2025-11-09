@@ -1,7 +1,7 @@
 model:
-  config_path: ./configs/model_configs/llada2_mini
-  model_path: ./LLaDA2.0-mini-preview-moe-merge
-  tokenizer_path: ./LLaDA2.0-mini-preview-moe-merge
+  config_path: ./configs/model_configs/llada2_flash
+  model_path: ./LLaDA2.0-flash-preview-moe-merge
+  tokenizer_path: ./LLaDA2.0-flash-preview-moe-merge
   attn_implementation: sdpa
   moe_implementation: fused
 
