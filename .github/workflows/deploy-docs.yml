@@ -1,0 +1,43 @@
+name: Deploy Documents
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "docs/**"
+  workflow_dispatch:  # Allows to trigger the workflow manually in GitHub UI
+
+jobs:
+  run:
+    name: "deploy docs"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: ./docs
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # See <https://github.com/mkdocs/mkdocs/issues/2370#issuecomment-821926264>
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Build HTML
+        uses: ammaraskar/sphinx-action@master
+        with:
+          docs-folder: "docs/"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v5
+        with:
+          name: html-docs
+          path: docs/build/html/
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v4
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/build/html
