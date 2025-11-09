@@ -6,7 +6,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](./LICENSE)
 [![HuggingFace: Models](https://img.shields.io/badge/HuggingFace-Models-yellow)](https://huggingface.co/inclusionAI/LLaDA2.0-mini-preview)
-
+[![Static Badge](https://img.shields.io/badge/Tutorial-Get_Start-red)](https://inclusionai.github.io/dFactory/)
+[![Static Badge](https://img.shields.io/badge/DeepWiki-Explore-green)](https://deepwiki.com/inclusionAI/dFactory)
 <!-- [![arXiv][arxiv-image]][arxiv-url] -->
 
 </h4>
