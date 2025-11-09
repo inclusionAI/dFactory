@@ -23,6 +23,6 @@ jobs:
           persist-credentials: false
 
       - name: Build HTML
-        uses: ammaraskar/sphinx-action@master
+        uses: ammaraskar/sphinx-action@8.2.3
         with:
           docs-folder: "docs/"
