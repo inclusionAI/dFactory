@@ -83,17 +83,17 @@ To train the model efficiently, Block Diffusion employs a clever unified attenti
    :align: center
    :width: 80%
 
-   The Block Diffusion Training Attention Mask (for `block_size=2`)
+   The Block Diffusion Training Attention Mask (for ``block_size=2``)
 
 This specialized mask consists of three distinct components that control the attention patterns:
 
-*   **Block Diagonal Mask (:math:`M_{BD}`)**:
+*   **Block Diagonal Mask** :math:`\mathcal{M}_{BD}`:
     Allows each token in the noised block :math:`\boldsymbol{x}_t` to attend only to other tokens *within the same block*. This constitutes the intra-block self-attention for the denoising task.
 
-*   **Offset Block Causal Mask (:math:`M_{OBC}`)**:
+*   **Offset Block Causal Mask** :math:`\mathcal{M}_{OBC}`:
     Allows tokens in a noised block in :math:`\boldsymbol{x}_t` to attend to all preceding *clean* blocks in :math:`\boldsymbol{x}_0`. This provides the essential conditional context required for denoising.
 
-*   **Block Causal Mask (:math:`M_{BC}`)**:
+*   **Block Causal Mask** :math:`\mathcal{M}_{BC}`:
     Applies a standard causal mask to the clean sequence :math:`\boldsymbol{x}_0`, ensuring each token can only attend to itself and preceding tokens. This part is responsible for computing the KV-cache.
 
 Helper Function to Create Block Diffusion Mask

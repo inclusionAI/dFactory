@@ -172,16 +172,16 @@
 <a class="reference internal image-reference" href="../_images/Block_Diffusion_Training_Attention_Mask.png"><img alt="Block Diffusion Training Attention Mask" src="../_images/Block_Diffusion_Training_Attention_Mask.png" style="width: 80%;" />
 </a>
 <figcaption>
-<p><span class="caption-text">The Block Diffusion Training Attention Mask (for <cite>block_size=2</cite>)</span><a class="headerlink" href="#id3" title="Link to this image"></a></p>
+<p><span class="caption-text">The Block Diffusion Training Attention Mask (for <code class="docutils literal notranslate"><span class="pre">block_size=2</span></code>)</span><a class="headerlink" href="#id3" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <p>This specialized mask consists of three distinct components that control the attention patterns:</p>
 <ul class="simple">
-<li><p><strong>Block Diagonal Mask (:math:`M_{BD}`)</strong>:
+<li><p><strong>Block Diagonal Mask</strong> <span class="math notranslate nohighlight">\(\mathcal{M}_{BD}\)</span>:
 Allows each token in the noised block <span class="math notranslate nohighlight">\(\boldsymbol{x}_t\)</span> to attend only to other tokens <em>within the same block</em>. This constitutes the intra-block self-attention for the denoising task.</p></li>
-<li><p><strong>Offset Block Causal Mask (:math:`M_{OBC}`)</strong>:
+<li><p><strong>Offset Block Causal Mask</strong> <span class="math notranslate nohighlight">\(\mathcal{M}_{OBC}\)</span>:
 Allows tokens in a noised block in <span class="math notranslate nohighlight">\(\boldsymbol{x}_t\)</span> to attend to all preceding <em>clean</em> blocks in <span class="math notranslate nohighlight">\(\boldsymbol{x}_0\)</span>. This provides the essential conditional context required for denoising.</p></li>
-<li><p><strong>Block Causal Mask (:math:`M_{BC}`)</strong>:
+<li><p><strong>Block Causal Mask</strong> <span class="math notranslate nohighlight">\(\mathcal{M}_{BC}\)</span>:
 Applies a standard causal mask to the clean sequence <span class="math notranslate nohighlight">\(\boldsymbol{x}_0\)</span>, ensuring each token can only attend to itself and preceding tokens. This part is responsible for computing the KV-cache.</p></li>
 </ul>
 </section>
