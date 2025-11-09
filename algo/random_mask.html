@@ -1,0 +1,209 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="An overview of the Discrete Diffusion Language Model (dLLM), including its masking process, training objectives, and inference methods." name="description" />
+<meta content="dLLM, Masked Diffusion, Language Model, Denoising, Generative AI" name="keywords" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Discrete Diffusion Model &mdash; dFactory  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=903dac86" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../_static/js/runllm-widget.js"></script>
+      <script src="../_static/js/resizable-sidebar.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Block Diffusion" href="block_diffusion.html" />
+    <link rel="prev" title="SGLang dLLM Inference Guide" href="../infer/sglang.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            dFactory
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../start/install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/preparation.html">Preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/quickstart.html">Quickstart: SFT upon dFactory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/configs.html">Configuration Design Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Train</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/distributed.html">Distributed Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/profiler.html">Profiler</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Inference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../infer/sglang.html">SGLang dLLM Inference Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Algorithms</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Discrete Diffusion Model</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#random-masking-process-forward-process">Random Masking Process (Forward Process)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pre-training-objective">Pre-training Objective</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#supervised-fine-tuning-sft">Supervised Fine-tuning (SFT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inference-the-reverse-denoising-process">Inference: The Reverse Denoising Process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#perplexity-ppl-calculation">Perplexity (PPL) Calculation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="block_diffusion.html">Block Diffusion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../faq/faq.html">Frequently Asked Questions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">dFactory</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Discrete Diffusion Model</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/algo/random_mask.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="discrete-diffusion-model">
+<h1>Discrete Diffusion Model<a class="headerlink" href="#discrete-diffusion-model" title="Link to this heading"></a></h1>
+<p>Last updated: 2025-10-28</p>
+<p>The Discrete Language Diffusion Model (dLLM), specifically the masked diffusion variant, presents a non-autoregressive approach to generative language modeling. Unlike traditional models that predict tokens one by one, dLLM learns to restore a complete, clean sequence from a partially masked version of it.</p>
+<section id="random-masking-process-forward-process">
+<h2>Random Masking Process (Forward Process)<a class="headerlink" href="#random-masking-process-forward-process" title="Link to this heading"></a></h2>
+<p>The core of the diffusion model is its forward process, which systematically introduces noise into the data. For discrete text data, this “noise” is the <code class="docutils literal notranslate"><span class="pre">[MASK]</span></code> token. We start with a clean, complete sequence <span class="math notranslate nohighlight">\(Y^{0}\)</span>. After adding noise for a given “time” <span class="math notranslate nohighlight">\(t\)</span>, it becomes a masked sequence <span class="math notranslate nohighlight">\(Y^{t}\)</span>, where <span class="math notranslate nohighlight">\(t \in [0, 1]\)</span>. When <span class="math notranslate nohighlight">\(t=1\)</span>, <span class="math notranslate nohighlight">\(Y^{1}\)</span> represents a sequence composed entirely of <code class="docutils literal notranslate"><span class="pre">[MASK]</span></code> tokens.</p>
+<p>This process can be visualized as gradually “erasing” tokens from a clean sentence. The higher the value of <span class="math notranslate nohighlight">\(t\)</span>, the more tokens are erased.</p>
+<ul>
+<li><p>A complete sequence with <span class="math notranslate nohighlight">\(L\)</span> tokens is written as:</p>
+<div class="math notranslate nohighlight">
+\[Y^{0} = [y^{0}_{1}, \dots, y^{0}_{L}]\]</div>
+</li>
+</ul>
+<p>The conditional probability of this masking process is defined as a product of independent probabilities for each token:</p>
+<div class="math notranslate nohighlight">
+\[q(Y^t|Y^0) = \prod_{i=1}^{L} q(y_i^t|y_i^0)\]</div>
+<p>where the probability for an individual token <span class="math notranslate nohighlight">\(y_i\)</span> to be masked at time <span class="math notranslate nohighlight">\(t\)</span> is:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}q(y_i^t|y_i^0) =
+\begin{cases}
+1-t, &amp; \text{if } y_i^t = y_i^0 \text{ (token remains unchanged)} \\
+t, &amp; \text{if } y_i^t = \text{[MASK]} \text{ (token is masked)}
+\end{cases}\end{split}\]</div>
+<p>The model is trained on pairs of <span class="math notranslate nohighlight">\((Y^t, Y^0)\)</span> with randomly sampled <span class="math notranslate nohighlight">\(t\)</span> values, learning to recover the original sequence from various levels of corruption.</p>
+</section>
+<section id="pre-training-objective">
+<h2>Pre-training Objective<a class="headerlink" href="#pre-training-objective" title="Link to this heading"></a></h2>
+<p>The model’s goal is to learn the reverse process: predicting the original data <span class="math notranslate nohighlight">\(Y^0\)</span> given the masked version <span class="math notranslate nohighlight">\(Y^t\)</span>. This is achieved by training a mask predictor, <span class="math notranslate nohighlight">\(p_{\theta}\)</span>, which is typically a Transformer architecture without a causal mask, allowing it to see the entire input sequence bidirectionally.</p>
+<p>In simple terms, the model is trained to be a universal “fill-in-the-blanks” expert. The pre-training loss function is defined as:</p>
+<div class="math notranslate nohighlight">
+\[\mathcal{L}_{\text{Pretrain}}(\theta) = -\mathbb{E}_{Y^{0}\sim p_{\text{data}}} \mathbb{E}_{t\sim \mathcal{U}[0,1]} \mathbb{E}_{Y^{t}\sim q(Y^{t}|Y^{0})} \left[ \frac{1}{t} \sum^{L}_{i=1} \mathbb{I}[y^{t}_{i}=\text{[MASK]}] \log p_{\theta}(y^{0}_{i}|Y^{t}) \right]\]</div>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\mathbb{I}[y^{t}_{i}=\text{[MASK]}]\)</span> is an indicator function that ensures the loss is only calculated for the tokens that were actually masked.</p></li>
+<li><p>The <span class="math notranslate nohighlight">\(\frac{1}{t}\)</span> term acts as a weighting factor. Intuitively, it can be seen as normalizing the loss by the expected number of masked tokens.</p></li>
+<li><p>This loss function, <span class="math notranslate nohighlight">\(\mathcal{L}_{\text{Pretrain}}\)</span>, serves as an upper bound on the negative log-likelihood of the data, providing a principled objective for generative modeling.</p></li>
+</ul>
+</section>
+<section id="supervised-fine-tuning-sft">
+<h2>Supervised Fine-tuning (SFT)<a class="headerlink" href="#supervised-fine-tuning-sft" title="Link to this heading"></a></h2>
+<p>To adapt the model for instruction-following, it is fine-tuned on a dataset of prompt-response pairs, denoted as <span class="math notranslate nohighlight">\((X, Y^0)\)</span>. A key distinction from pre-training is that the prompt <span class="math notranslate nohighlight">\(X\)</span> is <strong>always kept intact and is never masked</strong>. Only the tokens in the response <span class="math notranslate nohighlight">\(Y^0\)</span> are subject to the random masking process.</p>
+<p>The SFT objective is to teach the model to predict the masked tokens in the response, conditioned on both the unmasked response tokens and the full prompt. The objective function is defined as:</p>
+<div class="math notranslate nohighlight">
+\[\mathcal{L}_{\text{SFT}}(\theta) = -\mathbb{E}_{(X,Y^{0})\sim p_{\text{data}}} \mathbb{E}_{t\sim \mathcal{U}[0,1]} \mathbb{E}_{Y^{t}\sim q(Y^{t}|Y^{0})} \left[ \frac{1}{t} \sum^{|Y^{0}|}_{i=1} \mathbb{I}[y^{t}_{i}=\text{[MASK]}] \log p_{\theta}(y^{0}_{i}|X,Y^{t}) \right]\]</div>
+</section>
+<section id="inference-the-reverse-denoising-process">
+<h2>Inference: The Reverse Denoising Process<a class="headerlink" href="#inference-the-reverse-denoising-process" title="Link to this heading"></a></h2>
+<p>Generation is performed by simulating the reverse process. Starting from a fully masked sequence, the model iteratively predicts and refines the text over a series of discrete steps, moving from <span class="math notranslate nohighlight">\(t=1\)</span> down to <span class="math notranslate nohighlight">\(t=0\)</span>.</p>
+<p>The process for a given prompt <span class="math notranslate nohighlight">\(X\)</span> is as follows:</p>
+<ol class="arabic simple">
+<li><p><strong>Initialization</strong>: Start with a fully masked response sequence <span class="math notranslate nohighlight">\(Y^1\)</span> of a desired length.</p></li>
+<li><p><strong>Iterative Denoising</strong>: For a set number of steps (e.g., from <span class="math notranslate nohighlight">\(t=1\)</span> down to <span class="math notranslate nohighlight">\(s=0.9\)</span>, then to <span class="math notranslate nohighlight">\(s=0.8\)</span>, etc.):</p>
+<ol class="loweralpha simple">
+<li><p><strong>Predict</strong>: Feed the current masked sequence <span class="math notranslate nohighlight">\(Y^t\)</span> (along with the prompt <span class="math notranslate nohighlight">\(X\)</span>) into the model <span class="math notranslate nohighlight">\(p_{\theta}\)</span> to get a prediction for the complete, clean sequence.</p></li>
+<li><p><strong>Remask</strong>: Based on the prediction, generate the sequence for the next, slightly less noisy step, <span class="math notranslate nohighlight">\(Y^s\)</span>. This is crucial for aligning the sampling process with what the model learned during training. A common strategy is “low-confidence remasking,” where tokens predicted with the lowest confidence are chosen to be re-masked to <code class="docutils literal notranslate"><span class="pre">[MASK]</span></code> for the next step.</p></li>
+</ol>
+</li>
+<li><p><strong>Final Output</strong>: After the final step (at or near <span class="math notranslate nohighlight">\(t=0\)</span>), the resulting sequence is the generated text.</p></li>
+</ol>
+<p>This iterative process allows for a trade-off between generation quality and speed: more steps typically yield higher quality results but require more computation.</p>
+</section>
+<section id="perplexity-ppl-calculation">
+<h2>Perplexity (PPL) Calculation<a class="headerlink" href="#perplexity-ppl-calculation" title="Link to this heading"></a></h2>
+<p>To evaluate the model, perplexity (PPL) can be calculated using a Monte Carlo estimation based on the SFT objective. It measures how well the model predicts masked tokens from a held-out test set.</p>
+<div class="math notranslate nohighlight">
+\[PPL = \exp\left(-\mathbb{E}_{t,(X,Y^{0}),Y^{t}} \left[ \frac{1}{t} \sum^{L'}_{i=1} \mathbb{I}[y^{t}_{i}=\text{[MASK]}] \log p_{\theta}(y^{0}_{i}|X,Y^{t}) \right]\right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(L'\)</span> corresponds to the dynamic sequence length of the response.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../infer/sglang.html" class="btn btn-neutral float-left" title="SGLang dLLM Inference Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="block_diffusion.html" class="btn btn-neutral float-right" title="Block Diffusion" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, DILAB.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

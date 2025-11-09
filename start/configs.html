@@ -1,0 +1,365 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Configuration Design Guide &mdash; dFactory  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=903dac86" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/js/runllm-widget.js"></script>
+      <script src="../_static/js/resizable-sidebar.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Distributed Training" href="../advanced/distributed.html" />
+    <link rel="prev" title="Quickstart: SFT upon dFactory" href="quickstart.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            dFactory
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preparation.html">Preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart: SFT upon dFactory</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration Design Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#yaml-configuration-structure">YAML Configuration Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#model-configuration">Model Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#model-section">Model Section</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#data-configuration">Data Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#data-section">Data Section</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#training-configuration">Training Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#training-section">Training Section</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration-patterns">Configuration Patterns</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#model-scaling">Model Scaling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dataset-adaptation">Dataset Adaptation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#hardware-adaptation">Hardware Adaptation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#single-gpu-setup">Single GPU Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#multi-gpu-setup">Multi-GPU Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#memory-constrained-setup">Memory-Constrained Setup</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#best-practices">Best Practices</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Train</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/distributed.html">Distributed Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/profiler.html">Profiler</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Inference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../infer/sglang.html">SGLang dLLM Inference Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Algorithms</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../algo/random_mask.html">Discrete Diffusion Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../algo/block_diffusion.html">Block Diffusion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../faq/faq.html">Frequently Asked Questions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">dFactory</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Configuration Design Guide</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/start/configs.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="configuration-design-guide">
+<h1>Configuration Design Guide<a class="headerlink" href="#configuration-design-guide" title="Link to this heading"></a></h1>
+<section id="yaml-configuration-structure">
+<h2>YAML Configuration Structure<a class="headerlink" href="#yaml-configuration-structure" title="Link to this heading"></a></h2>
+<p>Configuration files use hierarchical YAML structure with three main sections:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">model</span><span class="p">:</span>
+<span class="w">  </span><span class="c1"># Model-specific settings</span>
+<span class="nt">data</span><span class="p">:</span>
+<span class="w">  </span><span class="c1"># Data loading and preprocessing</span>
+<span class="nt">train</span><span class="p">:</span>
+<span class="w">  </span><span class="c1"># Training hyperparameters and setup</span>
+</pre></div>
+</div>
+</section>
+<section id="model-configuration">
+<h2>Model Configuration<a class="headerlink" href="#model-configuration" title="Link to this heading"></a></h2>
+<section id="model-section">
+<h3>Model Section<a class="headerlink" href="#model-section" title="Link to this heading"></a></h3>
+<p><strong>Required fields:</strong></p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">model</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">config_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;./configs/model_configs/[model_name]&quot;</span>
+<span class="w">  </span><span class="nt">model_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;./path/to/model&quot;</span>
+<span class="w">  </span><span class="nt">tokenizer_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;./path/to/tokenizer&quot;</span>
+<span class="w">  </span><span class="nt">attn_implementation</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;sdpa&quot;</span><span class="w">        </span><span class="c1"># sdpa|eager|flex_attention</span>
+<span class="w">  </span><span class="nt">moe_implementation</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;fused&quot;</span><span class="w">        </span><span class="c1"># fused|standard</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>Flash Attention Limitation</strong>: The flash attention backend can only be used with <code class="docutils literal notranslate"><span class="pre">full_attention</span></code> or <code class="docutils literal notranslate"><span class="pre">causal_attention</span></code> modes. It <strong>cannot</strong> adapt to custom attention types used in LLaDA2.0 models. <strong>Do not use FlashAttention (flash_attn2/flash_attn) for Block Diffusion Mode models</strong>. See <a class="reference internal" href="../algo/block_diffusion.html"><span class="doc">Block Diffusion</span></a> for detailed explanation of block diffusion training.</p>
+</div>
+</section>
+</section>
+<section id="data-configuration">
+<h2>Data Configuration<a class="headerlink" href="#data-configuration" title="Link to this heading"></a></h2>
+<section id="data-section">
+<h3>Data Section<a class="headerlink" href="#data-section" title="Link to this heading"></a></h3>
+<p><strong>Template for conversation data:</strong></p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">data</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">train_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;./datasets/train.jsonl&quot;</span>
+<span class="w">  </span><span class="nt">data_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;conversation&quot;</span><span class="w">          </span><span class="c1"># conversation|plain|instruction</span>
+<span class="w">  </span><span class="nt">datasets_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mapping&quot;</span><span class="w">           </span><span class="c1"># mapping|streaming</span>
+<span class="w">  </span><span class="nt">dataloader_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;native&quot;</span><span class="w">          </span><span class="c1"># native|custom</span>
+<span class="w">  </span><span class="nt">max_seq_len</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2048</span>
+<span class="w">  </span><span class="nt">text_keys</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;messages&quot;</span><span class="w">              </span><span class="c1"># field name in JSON</span>
+<span class="w">  </span><span class="nt">noise_range_low</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.3</span><span class="w">               </span><span class="c1"># diffusion noise lower bound</span>
+<span class="w">  </span><span class="nt">noise_range_high</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.8</span><span class="w">              </span><span class="c1"># diffusion noise upper bound</span>
+<span class="w">  </span><span class="nt">num_workers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Support multiple data formats (JSONL, Parquet)</p></li>
+<li><p>Configurable noise ranges for diffusion training</p></li>
+<li><p>Flexible text field mapping</p></li>
+<li><p>Worker count based on CPU cores</p></li>
+</ul>
+</section>
+</section>
+<section id="training-configuration">
+<h2>Training Configuration<a class="headerlink" href="#training-configuration" title="Link to this heading"></a></h2>
+<section id="training-section">
+<h3>Training Section<a class="headerlink" href="#training-section" title="Link to this heading"></a></h3>
+<p><strong>Distributed training setup:</strong></p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">train</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">output_dir</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;./outputs/experiment_name&quot;</span>
+
+<span class="w">  </span><span class="c1"># Parallel configuration</span>
+<span class="w">  </span><span class="nt">data_parallel_mode</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;fsdp2&quot;</span><span class="w">        </span><span class="c1"># fsdp2</span>
+<span class="w">  </span><span class="nt">tensor_parallel_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">            </span><span class="c1"># model parallel</span>
+<span class="w">  </span><span class="nt">ulysses_parallel_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">           </span><span class="c1"># sequence parallel</span>
+<span class="w">  </span><span class="nt">expert_parallel_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">            </span><span class="c1"># MoE parallel</span>
+
+<span class="w">  </span><span class="c1"># Batch configuration</span>
+<span class="w">  </span><span class="nt">global_batch_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span><span class="w">              </span><span class="c1"># total batch across all GPUs</span>
+<span class="w">  </span><span class="nt">micro_batch_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">                </span><span class="c1"># batch per GPU</span>
+
+<span class="w">  </span><span class="c1"># Training schedule</span>
+<span class="w">  </span><span class="nt">num_train_epochs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">  </span><span class="nt">save_epochs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">                     </span><span class="c1"># checkpoint frequency</span>
+<span class="w">  </span><span class="nt">log_steps</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">                       </span><span class="c1"># logging frequency</span>
+</pre></div>
+</div>
+<p><strong>Optimization parameters:</strong></p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">train</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">optimizer</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;adamw&quot;</span>
+<span class="w">  </span><span class="nt">beta1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.9</span>
+<span class="w">  </span><span class="nt">beta2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.999</span>
+<span class="w">  </span><span class="nt">lr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0e-5</span><span class="w">                        </span><span class="c1"># learning rate</span>
+<span class="w">  </span><span class="nt">lr_warmup_ratio</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.03</span><span class="w">             </span><span class="c1"># warmup steps ratio</span>
+<span class="w">  </span><span class="nt">lr_decay_style</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cosine&quot;</span><span class="w">          </span><span class="c1"># cosine|linear|constant</span>
+<span class="w">  </span><span class="nt">weight_decay</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
+<span class="w">  </span><span class="nt">max_grad_norm</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span>
+</pre></div>
+</div>
+<p><strong>Memory optimization:</strong></p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">train</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">enable_mixed_precision</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="nt">enable_gradient_checkpointing</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="nt">enable_full_shard</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">           </span><span class="c1"># FSDP parameter sharding</span>
+<span class="w">  </span><span class="nt">enable_fsdp_offload</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">         </span><span class="c1"># CPU offloading</span>
+<span class="w">  </span><span class="nt">empty_cache_steps</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">500</span><span class="w">            </span><span class="c1"># GPU memory cleanup</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="configuration-patterns">
+<h2>Configuration Patterns<a class="headerlink" href="#configuration-patterns" title="Link to this heading"></a></h2>
+<section id="model-scaling">
+<h3>Model Scaling<a class="headerlink" href="#model-scaling" title="Link to this heading"></a></h3>
+<p><strong>Small model template:</strong></p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">train</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">global_batch_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8</span><span class="w">               </span><span class="c1"># Reduce for smaller models</span>
+<span class="w">  </span><span class="nt">micro_batch_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</pre></div>
+</div>
+<p><strong>Large model template:</strong></p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">train</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">global_batch_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">64</span><span class="w">              </span><span class="c1"># Increase for larger models</span>
+<span class="w">  </span><span class="nt">micro_batch_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">  </span><span class="nt">tensor_parallel_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w">            </span><span class="c1"># Enable model parallelism</span>
+<span class="w">  </span><span class="nt">expert_parallel_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w">            </span><span class="c1"># Distribute experts</span>
+</pre></div>
+</div>
+</section>
+<section id="dataset-adaptation">
+<h3>Dataset Adaptation<a class="headerlink" href="#dataset-adaptation" title="Link to this heading"></a></h3>
+<p><strong>For large datasets:</strong></p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">data</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">datasets_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;streaming&quot;</span><span class="w">        </span><span class="c1"># Memory-efficient loading</span>
+<span class="w">  </span><span class="nt">num_workers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32</span><span class="w">                   </span><span class="c1"># Increase workers</span>
+</pre></div>
+</div>
+<p><strong>For small datasets:</strong></p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">data</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">datasets_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mapping&quot;</span><span class="w">          </span><span class="c1"># Full dataset in memory</span>
+<span class="w">  </span><span class="nt">num_workers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8</span><span class="w">                    </span><span class="c1"># Reduce overhead</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="hardware-adaptation">
+<h2>Hardware Adaptation<a class="headerlink" href="#hardware-adaptation" title="Link to this heading"></a></h2>
+<section id="single-gpu-setup">
+<h3>Single GPU Setup<a class="headerlink" href="#single-gpu-setup" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">train</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">data_parallel_mode</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;fsdp2&quot;</span>
+<span class="w">  </span><span class="nt">tensor_parallel_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">  </span><span class="nt">expert_parallel_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">  </span><span class="nt">global_batch_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span><span class="w">            </span><span class="c1"># Fit single GPU</span>
+<span class="w">  </span><span class="nt">micro_batch_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">  </span><span class="nt">enable_fsdp_offload</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">      </span><span class="c1"># Disable offloading</span>
+</pre></div>
+</div>
+</section>
+<section id="multi-gpu-setup">
+<h3>Multi-GPU Setup<a class="headerlink" href="#multi-gpu-setup" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">train</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">data_parallel_mode</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;fsdp2&quot;</span>
+<span class="w">  </span><span class="nt">tensor_parallel_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">  </span><span class="nt">expert_parallel_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w">         </span><span class="c1"># Distribute experts</span>
+<span class="w">  </span><span class="nt">global_batch_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32</span><span class="w">           </span><span class="c1"># Scale with GPU count</span>
+<span class="w">  </span><span class="nt">micro_batch_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">  </span><span class="nt">enable_fsdp_offload</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">      </span><span class="c1"># Faster training</span>
+</pre></div>
+</div>
+</section>
+<section id="memory-constrained-setup">
+<h3>Memory-Constrained Setup<a class="headerlink" href="#memory-constrained-setup" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">train</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">enable_gradient_checkpointing</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="nt">enable_full_shard</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="nt">enable_fsdp_offload</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">       </span><span class="c1"># Enable CPU offloading</span>
+<span class="w">  </span><span class="nt">enable_activation_offload</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"> </span><span class="c1"># Reduce GPU memory</span>
+<span class="w">  </span><span class="nt">micro_batch_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">             </span><span class="c1"># Minimal per-GPU batch</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="best-practices">
+<h2>Best Practices<a class="headerlink" href="#best-practices" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt><strong>Path Management</strong></dt><dd><dl class="simple">
+<dt>Use relative paths for configs</dt><dd><p>Store absolute paths in environment variables
+Create separate output directories per experiment</p>
+</dd>
+</dl>
+</dd>
+<dt><strong>Parameter Tuning</strong></dt><dd><dl class="simple">
+<dt>Start with conservative batch sizes</dt><dd><p>Increase learning rate for larger batches
+Adjust warmup ratio based on dataset size</p>
+</dd>
+</dl>
+</dd>
+<dt><strong>Monitoring</strong></dt><dd><dl class="simple">
+<dt>Enable W&amp;B for experiment tracking</dt><dd><p>Set appropriate logging frequency
+Monitor gradient norms and loss curves</p>
+</dd>
+</dl>
+</dd>
+<dt><strong>Reproducibility</strong></dt><dd><dl class="simple">
+<dt>Fix random seeds in training scripts</dt><dd><p>Document configuration changes
+Version control configuration files</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="quickstart.html" class="btn btn-neutral float-left" title="Quickstart: SFT upon dFactory" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../advanced/distributed.html" class="btn btn-neutral float-right" title="Distributed Training" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, DILAB.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

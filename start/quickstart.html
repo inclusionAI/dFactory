@@ -1,0 +1,572 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quickstart: SFT upon dFactory &mdash; dFactory  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=903dac86" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/js/runllm-widget.js"></script>
+      <script src="../_static/js/resizable-sidebar.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Configuration Design Guide" href="configs.html" />
+    <link rel="prev" title="Preparation" href="preparation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            dFactory
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preparation.html">Preparation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quickstart: SFT upon dFactory</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#veomni-best-practices">VeOmni Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#run-example-script">Run Example Script</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create-custom-task-directory">Create Custom Task Directory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#launch-custom-training">Launch Custom Training</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arguments">Arguments</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#default-parameter-access">Default Parameter Access</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#custom-parameter-extension">Custom Parameter Extension</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#parallel-state">Parallel State</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dataset">Dataset</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#dataset-types">Dataset Types</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#custom-datasets">Custom Datasets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data-transform-preprocess">Data Transform (Preprocess)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#chat-template">Chat Template</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#dataloader">DataLoader</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#basic-usage">Basic Usage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#collate-function">Collate Function</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#model-and-optimizer">Model and Optimizer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#model-initialization">Model Initialization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#parallelize-your-model">Parallelize Your Model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#optimizer-and-lr-scheduler">Optimizer and LR Scheduler</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#train-loop">Train Loop</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#basic-training-loop">Basic Training Loop</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#custom-loss-function">Custom Loss Function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dataset-introduction">Dataset Introduction</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configs.html">Configuration Design Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Train</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/distributed.html">Distributed Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/profiler.html">Profiler</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Inference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../infer/sglang.html">SGLang dLLM Inference Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Algorithms</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../algo/random_mask.html">Discrete Diffusion Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../algo/block_diffusion.html">Block Diffusion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../faq/faq.html">Frequently Asked Questions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">dFactory</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Quickstart: SFT upon dFactory</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/start/quickstart.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="quickstart-sft-upon-dfactory">
+<span id="quickstart"></span><h1>Quickstart: SFT upon dFactory<a class="headerlink" href="#quickstart-sft-upon-dfactory" title="Link to this heading"></a></h1>
+<p>Last updated: 2025-11-04</p>
+<p>This quickstart guide provides comprehensive VeOmni best practices for training, including installation, configuration, and advanced usage patterns.</p>
+<section id="veomni-best-practices">
+<h2>VeOmni Best Practices<a class="headerlink" href="#veomni-best-practices" title="Link to this heading"></a></h2>
+<section id="usage">
+<h3>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h3>
+</section>
+<section id="run-example-script">
+<h3>Run Example Script<a class="headerlink" href="#run-example-script" title="Link to this heading"></a></h3>
+<p>Verify training startup (need to download the dataset first):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sh<span class="w"> </span>train.sh<span class="w"> </span>tasks/train_llada2_bd.py<span class="w"> </span>configs/sft/llada2_mini_bd_sft.yaml
+</pre></div>
+</div>
+</section>
+<section id="create-custom-task-directory">
+<h3>Create Custom Task Directory<a class="headerlink" href="#create-custom-task-directory" title="Link to this heading"></a></h3>
+<p><a class="reference external" href="../../tasks/train_torch.py">train_torch.py</a> can be used for most pre-training and post-training tasks. You can just modify the train config to complete your task. However, if you want to create a new task, you can copy the <code class="docutils literal notranslate"><span class="pre">train_torch.py</span></code> file from the <code class="docutils literal notranslate"><span class="pre">tasks</span></code> directory and modify it, like <a class="reference external" href="../../tasks/omni/train_qwen2_vl.py">tasks/omni/train_qwen2_vl.py</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>tasks/your_task
+cp<span class="w"> </span>tasks/train_torch.py<span class="w"> </span>tasks/your_task/train.py
+</pre></div>
+</div>
+</section>
+<section id="launch-custom-training">
+<h3>Launch Custom Training<a class="headerlink" href="#launch-custom-training" title="Link to this heading"></a></h3>
+<p>You can overwrite the default arguments in train yaml by passing them to the script.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>bash<span class="w"> </span>train.sh<span class="w"> </span>tasks/your_task/train.py<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="nv">$CONFIG</span>.yaml<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--model.model_path<span class="w"> </span>your_path_to_model<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--data.train_path<span class="w"> </span>your_path_to_dataset<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--train.output_dir<span class="w"> </span>your_path_to_save_checkpoints<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--train.wandb_project<span class="w"> </span>your_project_name<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--train.wandb_name<span class="w"> </span>your_experiment_name
+</pre></div>
+</div>
+</section>
+<section id="arguments">
+<h3>Arguments<a class="headerlink" href="#arguments" title="Link to this heading"></a></h3>
+<section id="default-parameter-access">
+<h4>Default Parameter Access<a class="headerlink" href="#default-parameter-access" title="Link to this heading"></a></h4>
+<p>VeOmni offers a unified argument management system that can be easily extended to support custom arguments. For default arguments explanation, refer to <a class="reference external" href="../config/config.md">Config arguments Explanation</a>.</p>
+<p>Source code: <a class="reference external" href="../../VeOmni/veomni/utils/arguments.py">veomni/utils/arguments.py</a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">veomni.utils.arguments</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataArguments</span><span class="p">,</span> <span class="n">ModelArguments</span><span class="p">,</span> <span class="n">TrainingArguments</span><span class="p">,</span> <span class="n">parse_args</span>
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Arguments</span><span class="p">:</span>
+    <span class="n">model</span><span class="p">:</span> <span class="s2">&quot;ModelArguments&quot;</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">ModelArguments</span><span class="p">)</span>
+    <span class="n">data</span><span class="p">:</span> <span class="s2">&quot;DataArguments&quot;</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">DataArguments</span><span class="p">)</span>
+    <span class="n">train</span><span class="p">:</span> <span class="s2">&quot;TrainingArguments&quot;</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">TrainingArguments</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parse_args</span><span class="p">(</span><span class="n">Arguments</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">lr</span><span class="p">)</span>  <span class="c1"># Access default arguments</span>
+</pre></div>
+</div>
+</section>
+<section id="custom-parameter-extension">
+<h4>Custom Parameter Extension<a class="headerlink" href="#custom-parameter-extension" title="Link to this heading"></a></h4>
+<p>You can extend the default arguments by creating a new class that inherits from the existing class.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CustomTrainingArguments</span><span class="p">(</span><span class="n">TrainingArguments</span><span class="p">):</span>
+    <span class="n">enable_xxx</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Enable me if necessary.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Arguments</span><span class="p">:</span>
+    <span class="n">model</span><span class="p">:</span> <span class="s2">&quot;ModelArguments&quot;</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">ModelArguments</span><span class="p">)</span>
+    <span class="n">data</span><span class="p">:</span> <span class="s2">&quot;DataArguments&quot;</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">DataArguments</span><span class="p">)</span>
+    <span class="n">train</span><span class="p">:</span> <span class="s2">&quot;CustomTrainingArguments&quot;</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">CustomTrainingArguments</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="parallel-state">
+<h3>Parallel State<a class="headerlink" href="#parallel-state" title="Link to this heading"></a></h3>
+<p>VeOmni uses torch device mesh to manage all parallel states, which is useful for multi-dimensional parallelism (i.e., 3-D parallel) where parallelism composability is required. You can create the parallel state by calling the <code class="docutils literal notranslate"><span class="pre">init_parallel_state</span></code> function and get the parallel state by calling the <code class="docutils literal notranslate"><span class="pre">get_parallel_state</span></code> function.</p>
+<p>For more details about torch device mesh, refer to <a class="reference external" href="https://pytorch.org/tutorials/recipes/distributed_device_mesh.html">Getting Started with DeviceMesh</a>.</p>
+<p>Source code: <a class="reference external" href="../../VeOmni/veomni/distributed/parallel_state.py">veomni/distributed/parallel_state.py</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The parallel state system provides a unified interface for managing different types of parallelism including data parallel, tensor parallel, expert parallel, and pipeline parallel.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">veomni.distributed.parallel_state</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_parallel_state</span><span class="p">,</span> <span class="n">init_parallel_state</span>
+
+<span class="n">init_parallel_state</span><span class="p">(</span>
+    <span class="n">dp_size</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">data_parallel_size</span><span class="p">,</span>  <span class="c1"># data parallel size</span>
+    <span class="n">dp_replicate_size</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">data_parallel_replicate_size</span><span class="p">,</span>  <span class="c1"># data parallel replicate size</span>
+    <span class="n">dp_shard_size</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">data_parallel_shard_size</span><span class="p">,</span>  <span class="c1"># data parallel shard degree</span>
+    <span class="n">tp_size</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">tensor_parallel_size</span><span class="p">,</span>  <span class="c1"># tensor parallel size</span>
+    <span class="n">ep_size</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">expert_parallel_size</span><span class="p">,</span>  <span class="c1"># expert parallel size</span>
+    <span class="n">pp_size</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">pipeline_parallel_size</span><span class="p">,</span>  <span class="c1"># pipeline parallel size, not supported now</span>
+    <span class="n">cp_size</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">context_parallel_size</span><span class="p">,</span>  <span class="c1"># context parallel size, not supported now</span>
+    <span class="n">ulysses_size</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">ulysses_parallel_size</span><span class="p">,</span>  <span class="c1"># ulysses parallel size</span>
+    <span class="n">dp_mode</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">data_parallel_mode</span><span class="p">,</span>  <span class="c1"># data parallel mode, can be &quot;ddp&quot;, &quot;fsdp1&quot;, &quot;fsdp2&quot;</span>
+<span class="p">)</span>
+
+<span class="n">parallel_state</span> <span class="o">=</span> <span class="n">get_parallel_state</span><span class="p">()</span>
+
+<span class="c1"># Access dp state</span>
+<span class="n">dp_mesh</span> <span class="o">=</span> <span class="n">parallel_state</span><span class="o">.</span><span class="n">dp_mesh</span>
+<span class="n">dp_group</span> <span class="o">=</span> <span class="n">parallel_state</span><span class="o">.</span><span class="n">dp_group</span>
+
+<span class="c1"># Access sp state</span>
+<span class="n">sp_group</span> <span class="o">=</span> <span class="n">parallel_state</span><span class="o">.</span><span class="n">sp_group</span>
+<span class="n">sp_rank</span> <span class="o">=</span> <span class="n">parallel_state</span><span class="o">.</span><span class="n">sp_rank</span>
+
+<span class="c1"># Access tp state</span>
+<span class="n">tp_group</span> <span class="o">=</span> <span class="n">parallel_state</span><span class="o">.</span><span class="n">tp_group</span>
+<span class="n">tp_mesh</span> <span class="o">=</span> <span class="n">parallel_state</span><span class="o">.</span><span class="n">tp_mesh</span>
+</pre></div>
+</div>
+</section>
+<section id="dataset">
+<h3>Dataset<a class="headerlink" href="#dataset" title="Link to this heading"></a></h3>
+<p>VeOmni supports two types of datasets by default:</p>
+<p>Source code: <a class="reference external" href="../../VeOmni/veomni/data/dataset.py">veomni/data/dataset.py</a></p>
+<section id="dataset-types">
+<h4>Dataset Types<a class="headerlink" href="#dataset-types" title="Link to this heading"></a></h4>
+<ol class="arabic simple">
+<li><p><strong>IterativeDataset</strong> (recommended for large datasets)</p></li>
+<li><p><strong>MappingDataset</strong> (default for small datasets)</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">veomni.data</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">build_iterative_dataset</span><span class="p">,</span>
+    <span class="n">build_mapping_dataset</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">datasets_type</span> <span class="o">==</span> <span class="s2">&quot;iterable&quot;</span><span class="p">:</span>
+    <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">build_iterative_dataset</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">train_path</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">compute_train_steps</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">max_seq_len</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">train_size</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">datasets_type</span> <span class="o">==</span> <span class="s2">&quot;mapping&quot;</span><span class="p">:</span>
+    <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">build_mapping_dataset</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">train_path</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">compute_train_steps</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">max_seq_len</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">train_size</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p><strong>Training Steps Calculation</strong></p>
+<ul class="simple">
+<li><p><strong>Iterable datasets</strong>: Add <code class="docutils literal notranslate"><span class="pre">data.train_size</span></code> (tokens to consume) to config. Train steps ≈ <code class="docutils literal notranslate"><span class="pre">train_size</span> <span class="pre">/</span> <span class="pre">(global_batch_size</span> <span class="pre">*</span> <span class="pre">max_seq_len)</span></code></p></li>
+<li><p><strong>Mapping datasets</strong>: Pass <code class="docutils literal notranslate"><span class="pre">len(train_dataset)</span></code> to compute correct train steps</p></li>
+</ul>
+</div>
+</section>
+<section id="custom-datasets">
+<h4>Custom Datasets<a class="headerlink" href="#custom-datasets" title="Link to this heading"></a></h4>
+<p>VeOmni is a flexible framework that supports custom datasets. You can implement your own dataset function and use it with VeOmni.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">build_custom_dataset</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="n">transform</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+    <span class="c1"># Implement your custom dataset logic</span>
+    <span class="k">pass</span>
+
+<span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">datasets_type</span> <span class="o">==</span> <span class="s2">&quot;custom&quot;</span><span class="p">:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info_rank0</span><span class="p">(</span><span class="s2">&quot;Start building custom dataset&quot;</span><span class="p">)</span>
+    <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">build_custom_dataset</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">train_path</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span>
+    <span class="c1"># For iterable datasets, remove len(train_dataset)</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">compute_train_steps</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">max_seq_len</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">train_size</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+<section id="data-transform-preprocess">
+<h4>Data Transform (Preprocess)<a class="headerlink" href="#data-transform-preprocess" title="Link to this heading"></a></h4>
+<p>VeOmni supports two types of transforms by default:</p>
+<p>Source code: <a class="reference external" href="../../VeOmni/veomni/data/data_transform.py">veomni/data/data_transform.py</a></p>
+<section id="transform-types">
+<h5>Transform Types<a class="headerlink" href="#transform-types" title="Link to this heading"></a></h5>
+<ol class="arabic simple">
+<li><p><strong>process_pretrain_example</strong> (recommended for pretrain task)</p></li>
+<li><p><strong>process_sft_example</strong> (recommended for sft task)</p></li>
+</ol>
+</section>
+<section id="pretrain-example">
+<h5>Pretrain Example<a class="headerlink" href="#pretrain-example" title="Link to this heading"></a></h5>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">veomni.data.data_transform</span><span class="w"> </span><span class="kn">import</span> <span class="n">process_pretrain_example</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">veomni.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_tokenizer</span>
+
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">build_tokenizer</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">tokenizer_path</span><span class="p">)</span>
+<span class="c1"># To use AutoTokenizer, replace the line above with the following:</span>
+<span class="c1"># tokenizer = AutoTokenizer.from_pretrained(args.model.tokenizer_path)</span>
+
+<span class="n">transform</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
+    <span class="n">process_pretrain_example</span><span class="p">,</span>
+    <span class="n">tokenizer</span><span class="o">=</span><span class="n">tokenizer</span><span class="p">,</span>
+    <span class="n">max_seq_len</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">max_seq_len</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="sft-example">
+<h5>SFT Example<a class="headerlink" href="#sft-example" title="Link to this heading"></a></h5>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">veomni.data.chat_template</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_chat_template</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">veomni.data.data_transform</span><span class="w"> </span><span class="kn">import</span> <span class="n">process_sft_example</span>
+
+<span class="n">chat_template</span> <span class="o">=</span> <span class="n">build_chat_template</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">chat_template</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">)</span>
+<span class="n">transform</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
+    <span class="n">process_sft_example</span><span class="p">,</span>
+    <span class="n">chat_template</span><span class="o">=</span><span class="n">chat_template</span><span class="p">,</span>
+    <span class="n">max_seq_len</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">max_seq_len</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="chat-template">
+<h4>Chat Template<a class="headerlink" href="#chat-template" title="Link to this heading"></a></h4>
+<p>VeOmni supports several chat templates by default and you can add your custom chat template by implementing the <code class="docutils literal notranslate"><span class="pre">ChatTemplate</span></code> class.</p>
+<p>Source code: <a class="reference external" href="../../VeOmni/veomni/data/chat_template.py">veomni/data/chat_template.py</a></p>
+<section id="custom-template-implementation">
+<h5>Custom Template Implementation<a class="headerlink" href="#custom-template-implementation" title="Link to this heading"></a></h5>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">veomni.data.chat_template</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatTemplate</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CustomTemplate</span><span class="p">(</span><span class="n">ChatTemplate</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">encode_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">messages</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span> <span class="n">max_seq_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8192</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+        <span class="c1"># Implement encoding logic</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_jinja_template</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># Jinja template string</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="dataloader">
+<h3>DataLoader<a class="headerlink" href="#dataloader" title="Link to this heading"></a></h3>
+<p>VeOmni offers a flexible and powerful dataloader implementation that supports:</p>
+<ul class="simple">
+<li><p>Both padding and remove padding (packing) strategy</p></li>
+<li><p>Dynamic batching strategy</p></li>
+</ul>
+<p>Source code: <a class="reference external" href="../../VeOmni/veomni/data/data_loader.py">veomni/data/data_loader.py</a></p>
+<section id="basic-usage">
+<h4>Basic Usage<a class="headerlink" href="#basic-usage" title="Link to this heading"></a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">veomni.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_dataloader</span><span class="p">,</span> <span class="n">build_mapping_dataset</span>
+
+<span class="n">transform</span> <span class="o">=</span> <span class="n">YOUR_TRANSFORM_FUNCTION</span>
+
+<span class="n">train_dataset</span> <span class="o">=</span> <span class="n">build_mapping_dataset</span><span class="p">(</span>
+    <span class="n">data_path</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">train_path</span><span class="p">,</span>
+    <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">compute_train_steps</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">max_seq_len</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">train_size</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">))</span>
+
+<span class="n">train_dataloader</span> <span class="o">=</span> <span class="n">build_dataloader</span><span class="p">(</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="n">train_dataset</span><span class="p">,</span>
+    <span class="n">micro_batch_size</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">micro_batch_size</span><span class="p">,</span>
+    <span class="n">global_batch_size</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">global_batch_size</span><span class="p">,</span>
+    <span class="n">dataloader_batch_size</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">dataloader_batch_size</span><span class="p">,</span>
+    <span class="n">seed</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">seed</span><span class="p">,</span>
+    <span class="n">max_seq_len</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">max_seq_len</span><span class="p">,</span>
+    <span class="n">collate_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">train_steps</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">train_steps</span><span class="p">,</span>
+    <span class="n">rmpad</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">rmpad</span><span class="p">,</span>
+    <span class="n">rmpad_with_pos_ids</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">rmpad_with_pos_ids</span><span class="p">,</span>
+    <span class="n">bsz_warmup_ratio</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">bsz_warmup_ratio</span><span class="p">,</span>
+    <span class="n">bsz_warmup_init_mbtoken</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">bsz_warmup_init_mbtoken</span><span class="p">,</span>
+    <span class="n">dyn_bsz_margin</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">dyn_bsz_margin</span><span class="p">,</span>
+    <span class="n">dyn_bsz_buffer_size</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">dyn_bsz_buffer_size</span><span class="p">,</span>
+    <span class="n">num_workers</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span>
+    <span class="n">drop_last</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">drop_last</span><span class="p">,</span>
+    <span class="n">pin_memory</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">pin_memory</span><span class="p">,</span>
+    <span class="n">prefetch_factor</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">prefetch_factor</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="collate-function">
+<h4>Collate Function<a class="headerlink" href="#collate-function" title="Link to this heading"></a></h4>
+<p>VeOmni supports three types of collate functions for text tasks by default:</p>
+<p><strong>Text Tasks:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">DataCollatorWithPadding</span></code> (enabled when <code class="docutils literal notranslate"><span class="pre">rmpad</span></code> is False and <code class="docutils literal notranslate"><span class="pre">rmpad_with_pos_ids</span></code> is False)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DataCollatorWithPacking</span></code> (enabled when <code class="docutils literal notranslate"><span class="pre">rmpad</span></code> is True and <code class="docutils literal notranslate"><span class="pre">rmpad_with_pos_ids</span></code> is False)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DataCollatorWithPositionIDs</span></code> (enabled when <code class="docutils literal notranslate"><span class="pre">rmpad</span></code> is False and <code class="docutils literal notranslate"><span class="pre">rmpad_with_pos_ids</span></code> is True)</p></li>
+</ul>
+<p><strong>Omni Model Tasks:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">OmniDataCollatorWithPacking</span></code> (for when <code class="docutils literal notranslate"><span class="pre">rmpad_with_pos_ids</span></code> is True)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">OmniDataCollatorWithPadding</span></code> (for when <code class="docutils literal notranslate"><span class="pre">rmpad</span></code> is False and <code class="docutils literal notranslate"><span class="pre">rmpad_with_pos_ids</span></code> is False)</p></li>
+</ul>
+<p>Source code: <a class="reference external" href="../../VeOmni/veomni/data/data_collator.py">veomni/data/data_collator.py</a></p>
+<p>Omni model details: <a class="reference external" href="../../VeOmni/veomni/data/multimodal/data_collator.py">veomni/data/multimodal/data_collator.py</a> and usage in <a class="reference external" href="../../tasks/omni/train_omni_model.py">train_omni_model.py</a>”</p>
+</section>
+</section>
+</section>
+<section id="model-and-optimizer">
+<h2>Model and Optimizer<a class="headerlink" href="#model-and-optimizer" title="Link to this heading"></a></h2>
+<section id="model-initialization">
+<h3>Model Initialization<a class="headerlink" href="#model-initialization" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">build_foundation_model</span></code> implements model initialization with config and weights path:</p>
+<ul class="simple">
+<li><p>Meta device initialization</p></li>
+<li><p>Initialize model from model config or weights path</p></li>
+</ul>
+<p>Source code: <a class="reference external" href="../../VeOmni/veomni/models/auto.py">veomni/models/auto.py</a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">veomni.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_foundation_model</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">build_foundation_model</span><span class="p">(</span>
+    <span class="n">config_path</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config_path</span><span class="p">,</span>  <span class="c1"># model config path, can be None if weights_path is not None</span>
+    <span class="n">weights_path</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_path</span><span class="p">,</span>  <span class="c1"># model weights path, can be None if config_path is not None</span>
+    <span class="n">init_device</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">init_device</span><span class="p">,</span>  <span class="c1"># model init device</span>
+<span class="p">)</span>
+
+<span class="c1"># You can replace with the following code if you want to use AutoModelForCausalLM from transformers</span>
+<span class="c1"># model = AutoModelForCausalLM.from_pretrained(args.model.model_path)</span>
+</pre></div>
+</div>
+</section>
+<section id="parallelize-your-model">
+<h3>Parallelize Your Model<a class="headerlink" href="#parallelize-your-model" title="Link to this heading"></a></h3>
+<p>Source code: <a class="reference external" href="../../VeOmni/veomni/distributed/torch_parallelize.py">veomni/distributed/torch_parallelize.py</a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">veomni.distributed.torch_parallelize</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_parallelize_model</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">build_foundation_model</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">build_parallelize_model</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">enable_full_shard</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">enable_full_shard</span><span class="p">,</span>
+    <span class="n">enable_mixed_precision</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">enable_mixed_precision</span><span class="p">,</span>
+    <span class="n">enable_gradient_checkpointing</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">enable_gradient_checkpointing</span><span class="p">,</span>
+    <span class="n">init_device</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">init_device</span><span class="p">,</span>
+    <span class="n">enable_fsdp_offload</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">enable_fsdp_offload</span><span class="p">,</span>
+    <span class="n">basic_modules</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">_no_split_modules</span> <span class="o">+</span> <span class="n">args</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">basic_modules</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="optimizer-and-lr-scheduler">
+<h3>Optimizer and LR Scheduler<a class="headerlink" href="#optimizer-and-lr-scheduler" title="Link to this heading"></a></h3>
+<p>Source code: <a class="reference external" href="../../VeOmni/veomni/optim">veomni/optim</a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">veomni.optim</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_lr_scheduler</span><span class="p">,</span> <span class="n">build_optimizer</span>
+
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">build_optimizer</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">lr</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">lr</span><span class="p">,</span>
+    <span class="n">weight_decay</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">weight_decay</span><span class="p">,</span>
+    <span class="c1"># ... other parameters</span>
+<span class="p">)</span>
+
+<span class="n">lr_scheduler</span> <span class="o">=</span> <span class="n">build_lr_scheduler</span><span class="p">(</span>
+    <span class="n">optimizer</span><span class="p">,</span>
+    <span class="n">train_steps</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">train_steps</span> <span class="o">*</span> <span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">num_train_epochs</span><span class="p">,</span>
+    <span class="c1"># ... other parameters</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="train-loop">
+<h2>Train Loop<a class="headerlink" href="#train-loop" title="Link to this heading"></a></h2>
+<p>After the parallel_state, model, optimizer, and dataloader are initialized, you can start the training loop.</p>
+<section id="basic-training-loop">
+<h3>Basic Training Loop<a class="headerlink" href="#basic-training-loop" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">num_train_epochs</span><span class="p">):</span>
+    <span class="n">data_iterator</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">train_dataloader</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">train_steps</span><span class="p">):</span>
+        <span class="n">micro_batches</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">data_iterator</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">micro_batch</span> <span class="ow">in</span> <span class="n">micro_batches</span><span class="p">:</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">micro_batch</span><span class="p">)</span><span class="o">.</span><span class="n">loss</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">micro_batches</span><span class="p">)</span>
+            <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+        <span class="n">lr_scheduler</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="custom-loss-function">
+<h3>Custom Loss Function<a class="headerlink" href="#custom-loss-function" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+
+<span class="n">loss_fct</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">loss_func</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">loss_fct</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+
+<span class="c1"># In train loop:</span>
+<span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">micro_batch</span><span class="p">)</span>
+<span class="n">logits</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">logits</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">loss_func</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">micro_batches</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="prerequisites">
+<h3>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>The latest version of <code class="docutils literal notranslate"><span class="pre">veomni</span></code> and its dependencies installed following the installation guide</p></li>
+<li><p>A compatible GPU with sufficient memory (e.g., NVIDIA A100 with 40GB or higher)</p></li>
+</ul>
+</section>
+<section id="dataset-introduction">
+<h3>Dataset Introduction<a class="headerlink" href="#dataset-introduction" title="Link to this heading"></a></h3>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="preparation.html" class="btn btn-neutral float-left" title="Preparation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="configs.html" class="btn btn-neutral float-right" title="Configuration Design Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, DILAB.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

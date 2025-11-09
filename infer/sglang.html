@@ -1,0 +1,220 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SGLang dLLM Inference Guide &mdash; dFactory  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=903dac86" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/js/runllm-widget.js"></script>
+      <script src="../_static/js/resizable-sidebar.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Discrete Diffusion Model" href="../algo/random_mask.html" />
+    <link rel="prev" title="Profiler" href="../advanced/profiler.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            dFactory
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../start/install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/preparation.html">Preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/quickstart.html">Quickstart: SFT upon dFactory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/configs.html">Configuration Design Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Train</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/distributed.html">Distributed Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/profiler.html">Profiler</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Inference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">SGLang dLLM Inference Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#server-launch">Server Launch</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#key-parameters">Key Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#api-usage">API Usage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#request-format">Request Format</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#additional-resources">Additional Resources</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Algorithms</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../algo/random_mask.html">Discrete Diffusion Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../algo/block_diffusion.html">Block Diffusion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../faq/faq.html">Frequently Asked Questions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">dFactory</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">SGLang dLLM Inference Guide</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/infer/sglang.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="sglang-dllm-inference-guide">
+<h1>SGLang dLLM Inference Guide<a class="headerlink" href="#sglang-dllm-inference-guide" title="Link to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>The dLLM (diffusion language model) paradigm is rapidly evolving, and inference ecosystems are still maturing. This guide provides a practical approach to launching dLLM inference services using SGLang.</p>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<p>Install the specific SGLang version with dLLM support:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com/sgl-project/sglang.git@refs/pull/12588/head
+</pre></div>
+</div>
+</section>
+<section id="server-launch">
+<h2>Server Launch<a class="headerlink" href="#server-launch" title="Link to this heading"></a></h2>
+<p>Launch the SGLang inference server with dLLM-specific parameters:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>-m<span class="w"> </span>sglang.launch_server<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--model-path<span class="w"> </span>/path/to/LLaDA2.0-flash-preview/<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--host<span class="w"> </span><span class="m">127</span>.0.0.1<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--port<span class="w"> </span><span class="m">8188</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--trust-remote-code<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--disable-cuda-graph<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--disable-radix-cache<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--mem-fraction-static<span class="w"> </span><span class="m">0</span>.9<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--attention-backend<span class="w"> </span>flashinfer<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--diffusion-algorithm<span class="w"> </span><span class="s2">&quot;LowConfidence&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--diffusion-block-size<span class="w"> </span><span class="m">32</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--tp-size<span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--max-running-requests<span class="w"> </span><span class="m">1</span>
+</pre></div>
+</div>
+<section id="key-parameters">
+<h3>Key Parameters<a class="headerlink" href="#key-parameters" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--diffusion-algorithm</span></code>: Set to “LowConfidence” for dLLM inference</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--diffusion-block-size</span></code>: Block size for diffusion generation (default: 32)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--attention-backend</span></code>: Use “flashinfer” for optimal performance</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--tp-size</span></code>: Tensor parallelism size (adjust based on GPU count)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--max-running-requests</span></code>: Limit concurrent requests for stability</p></li>
+</ul>
+</section>
+</section>
+<section id="api-usage">
+<h2>API Usage<a class="headerlink" href="#api-usage" title="Link to this heading"></a></h2>
+<p>Send requests to the inference endpoint:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">&quot;http://127.0.0.1:8188/generate&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
+<span class="s1">        &quot;text&quot;: &quot;&lt;role&gt;SYSTEM&lt;/role&gt;detailed thinking off&lt;|role_end|&gt;&lt;role&gt;HUMAN&lt;/role&gt;Why did Camus say that Sisyphus was happy?&lt;|role_end|&gt;&lt;role&gt;ASSISTANT&lt;/role&gt;&quot;,</span>
+<span class="s1">        &quot;stream&quot;: true,</span>
+<span class="s1">        &quot;sampling_params&quot;: {</span>
+<span class="s1">            &quot;temperature&quot;: 0,</span>
+<span class="s1">            &quot;max_new_tokens&quot;: 1024</span>
+<span class="s1">        }</span>
+<span class="s1">    }&#39;</span>
+</pre></div>
+</div>
+<section id="request-format">
+<h3>Request Format<a class="headerlink" href="#request-format" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">text</span></code>: Input text with role-based formatting</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">stream</span></code>: Enable streaming responses</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sampling_params</span></code>: Generation parameters</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">temperature</span></code>: Sampling temperature (0 for deterministic)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">max_new_tokens</span></code>: Maximum tokens to generate</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+<section id="additional-resources">
+<h2>Additional Resources<a class="headerlink" href="#additional-resources" title="Link to this heading"></a></h2>
+<p>For detailed implementation discussion and RFC, see:
+<a class="reference external" href="https://github.com/sgl-project/sglang/issues/12766">https://github.com/sgl-project/sglang/issues/12766</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../advanced/profiler.html" class="btn btn-neutral float-left" title="Profiler" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../algo/random_mask.html" class="btn btn-neutral float-right" title="Discrete Diffusion Model" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, DILAB.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

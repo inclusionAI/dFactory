@@ -1,0 +1,24 @@
+/* 让代码块自动换行 */
+.highlight pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-x: auto;
+}
+
+/* 限制最大宽度 */
+.highlight {
+    max-width: 100%;
+}
+
+/* 代码块容器样式 */
+.literal-block-wrapper {
+    max-width: 100%;
+}
+
+/* 额外的响应式支持 */
+@media screen and (max-width: 768px) {
+    .highlight pre {
+        font-size: 0.9em;
+        line-height: 1.4;
+    }
+}

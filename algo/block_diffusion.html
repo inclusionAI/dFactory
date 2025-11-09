@@ -1,0 +1,299 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Block Diffusion &mdash; dFactory  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=903dac86" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../_static/js/runllm-widget.js"></script>
+      <script src="../_static/js/resizable-sidebar.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Frequently Asked Questions" href="../faq/faq.html" />
+    <link rel="prev" title="Discrete Diffusion Model" href="random_mask.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            dFactory
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../start/install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/preparation.html">Preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/quickstart.html">Quickstart: SFT upon dFactory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/configs.html">Configuration Design Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Train</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/distributed.html">Distributed Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/profiler.html">Profiler</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Inference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../infer/sglang.html">SGLang dLLM Inference Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Algorithms</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="random_mask.html">Discrete Diffusion Model</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Block Diffusion</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#core-design-rationale">Core Design Rationale</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#methodology">Methodology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#helper-function-to-create-block-diffusion-mask">Helper Function to Create Block Diffusion Mask</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../faq/faq.html">Frequently Asked Questions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">dFactory</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Block Diffusion</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/algo/block_diffusion.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="block-diffusion">
+<h1>Block Diffusion<a class="headerlink" href="#block-diffusion" title="Link to this heading"></a></h1>
+<p>Last updated: 2025-10-28</p>
+<p><a class="reference external" href="https://arxiv.org/abs/2503.09573">Arriola et al. (2025)</a> introduce Block Diffusion, a novel class of language models designed to interpolate between discrete denoising diffusion and autoregressive paradigms.</p>
+<section id="core-design-rationale">
+<h2>Core Design Rationale<a class="headerlink" href="#core-design-rationale" title="Link to this heading"></a></h2>
+<p>The core design of Block Diffusion stems from a careful analysis of the trade-offs between the two dominant language modeling paradigms:</p>
+<ul class="simple">
+<li><p><strong>Autoregressive Models (e.g., GPT series)</strong></p>
+<ul>
+<li><p><strong>Advantages</strong>: Capable of generating sequences of any length, produce high-quality output, and can leverage KV-caching for efficient inference.</p></li>
+<li><p><strong>Disadvantages</strong>: Generation is sequential (token-by-token), which makes it slow and inherently non-parallelizable.</p></li>
+</ul>
+</li>
+<li><p><strong>Discrete Diffusion Models</strong></p>
+<ul>
+<li><p><strong>Advantages</strong>: Generation is highly parallelizable (e.g., denoising an entire sequence at once) and offers excellent controllability.</p></li>
+<li><p><strong>Disadvantages</strong>: Typically limited to fixed-length generation, their quality (as measured by metrics like perplexity) often lags behind autoregressive models, and they cannot use KV-caching.</p></li>
+</ul>
+</li>
+</ul>
+<p><strong>Core Hypothesis</strong>: By structuring generation to be autoregressive <em>between</em> blocks of tokens and parallel <em>within</em> each block, a hybrid model can combine the best of both worlds. This “autoregressive at the macro level, parallel diffusion at the micro level” approach allows the model to:</p>
+<ol class="arabic simple">
+<li><p>Support <strong>arbitrary-length generation</strong> and <strong>KV-caching</strong>, like autoregressive models.</p></li>
+<li><p>Enable <strong>parallel sampling</strong> within blocks, boosting speed and quality, similar to diffusion models.</p></li>
+</ol>
+</section>
+<section id="methodology">
+<h2>Methodology<a class="headerlink" href="#methodology" title="Link to this heading"></a></h2>
+<p>Block Diffusion’s effectiveness relies on its unique probabilistic modeling and an efficient training strategy.</p>
+<p><strong>Noising Process</strong></p>
+<p>The model is built upon the D3PM (Discrete Denoising Diffusion Probabilistic Models) framework. It defines a forward noising process where a clean data sequence <span class="math notranslate nohighlight">\(\boldsymbol{x}^{0}\)</span> is progressively corrupted over a continuous time step <span class="math notranslate nohighlight">\(t \in [0, 1]\)</span> to produce a noisier version <span class="math notranslate nohighlight">\(\boldsymbol{x}^{t}\)</span>. This transition is defined as:</p>
+<div class="math notranslate nohighlight">
+\[q(\boldsymbol{x}^{t}_{\ell}|\boldsymbol{x}^{s}_{\ell}) = \text{Cat}(\boldsymbol{x}^{t}_{\ell};\boldsymbol{Q}_{t}\boldsymbol{x}^{s}_{\ell})\]</div>
+<p>Here, <span class="math notranslate nohighlight">\(\boldsymbol{x}^{t}_{\ell}\)</span> is the state of the <span class="math notranslate nohighlight">\(\ell\)</span>-th token at time <span class="math notranslate nohighlight">\(t\)</span>. The transition matrix <span class="math notranslate nohighlight">\(\boldsymbol{Q}_{t}\in \mathbb{R}^{V\times V}\)</span> (where V is the vocabulary size) models various transformations, such as random token replacement or masking.</p>
+<p><strong>Block Diffusion Attention Mask</strong></p>
+<p>A crucial component of Block Diffusion is its specialized attention mask, which dictates how tokens interact during both training and inference. The mask is designed to facilitate the “macro autoregressive, micro parallel” generation strategy.</p>
+<figure class="align-center" id="id1">
+<a class="reference internal image-reference" href="../_images/Block_Diffusion_Attention_Mask.png"><img alt="Block Diffusion Attention Mask" src="../_images/Block_Diffusion_Attention_Mask.png" style="width: 50%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Block Diffusion Attention Mask (<code class="docutils literal notranslate"><span class="pre">block_size=4</span></code> example)</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>This figure illustrates the attention mask for a <cite>block_size=4</cite> scenario. The mask combines different attention patterns to enable efficient block-wise generation while maintaining contextual awareness:</p>
+<ul class="simple">
+<li><p><strong>Block-local attention</strong>: Within each block, tokens can attend to all other tokens in that same block. This is essential for the parallel denoising steps.</p></li>
+<li><p><strong>Causal attention to preceding blocks</strong>: Each token can attend to all tokens in previously generated blocks. This maintains the autoregressive property at the block level, allowing the model to build coherent sequences.</p></li>
+<li><p><strong>No future attention</strong>: Tokens cannot attend to tokens in future blocks, upholding the causal nature of sequence generation.</p></li>
+</ul>
+<p><strong>Decoding Pipeline</strong></p>
+<p>The decoding (or sampling) process clearly illustrates the model’s hybrid nature, proceeding one block at a time:</p>
+<figure class="align-center" id="id2">
+<a class="reference internal image-reference" href="../_images/Block_Diffusion_Decoding.png"><img alt="Block Diffusion Decoding Pipeline" src="../_images/Block_Diffusion_Decoding.png" style="width: 80%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">The Block Diffusion Decoding Pipeline</span><a class="headerlink" href="#id2" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<ol class="arabic simple">
+<li><p><strong>Initialization</strong>: The process starts with an initial prompt or a start-of-sequence <code class="docutils literal notranslate"><span class="pre">[BOS]</span></code> token.</p></li>
+<li><p><strong>Block Generation</strong>: Using all previously generated text as a condition, a new block of tokens is generated in parallel via the reverse denoising process of the diffusion model.</p></li>
+<li><p><strong>KV-Caching</strong>: The Key and Value states for the newly generated block are computed and cached.</p></li>
+<li><p><strong>Iteration</strong>: The model uses the full sequence of generated text (including the newest block) as the condition for the next block generation, repeating steps 2 and 3 until an end-of-sequence <code class="docutils literal notranslate"><span class="pre">[EOS]</span></code> token is produced or the desired length is reached.</p></li>
+</ol>
+<p><strong>Efficient Training: The Unified Attention Mask</strong></p>
+<p>To train the model efficiently, Block Diffusion employs a clever unified attention mechanism that avoids multiple forward passes. The core idea is to concatenate the noised sequence <span class="math notranslate nohighlight">\(\boldsymbol{x}_t\)</span> and the original clean sequence <span class="math notranslate nohighlight">\(\boldsymbol{x}_0\)</span> into a single input. A specially designed attention mask then governs the flow of information within this combined sequence during a single forward pass.</p>
+<figure class="align-center" id="id3">
+<a class="reference internal image-reference" href="../_images/Block_Diffusion_Training_Attention_Mask.png"><img alt="Block Diffusion Training Attention Mask" src="../_images/Block_Diffusion_Training_Attention_Mask.png" style="width: 80%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">The Block Diffusion Training Attention Mask (for <cite>block_size=2</cite>)</span><a class="headerlink" href="#id3" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>This specialized mask consists of three distinct components that control the attention patterns:</p>
+<ul class="simple">
+<li><p><strong>Block Diagonal Mask (:math:`M_{BD}`)</strong>:
+Allows each token in the noised block <span class="math notranslate nohighlight">\(\boldsymbol{x}_t\)</span> to attend only to other tokens <em>within the same block</em>. This constitutes the intra-block self-attention for the denoising task.</p></li>
+<li><p><strong>Offset Block Causal Mask (:math:`M_{OBC}`)</strong>:
+Allows tokens in a noised block in <span class="math notranslate nohighlight">\(\boldsymbol{x}_t\)</span> to attend to all preceding <em>clean</em> blocks in <span class="math notranslate nohighlight">\(\boldsymbol{x}_0\)</span>. This provides the essential conditional context required for denoising.</p></li>
+<li><p><strong>Block Causal Mask (:math:`M_{BC}`)</strong>:
+Applies a standard causal mask to the clean sequence <span class="math notranslate nohighlight">\(\boldsymbol{x}_0\)</span>, ensuring each token can only attend to itself and preceding tokens. This part is responsible for computing the KV-cache.</p></li>
+</ul>
+</section>
+<section id="helper-function-to-create-block-diffusion-mask">
+<h2>Helper Function to Create Block Diffusion Mask<a class="headerlink" href="#helper-function-to-create-block-diffusion-mask" title="Link to this heading"></a></h2>
+<p>The Python function below precisely implements the three-part attention mask logic described above. It is designed for integration with modern deep learning frameworks that support sparse attention (like PyTorch’s FlexAttention) to achieve maximum training efficiency.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">block_diff_mask</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">q_idx</span><span class="p">,</span> <span class="n">kv_idx</span><span class="p">,</span> <span class="n">block_size</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Constructs the specialized block diffusion attention mask composed of</span>
+<span class="sd">    three masks:</span>
+<span class="sd">        - **Block Diagonal Mask (M_BD)**: Self-attention within noised blocks</span>
+<span class="sd">        - **Offset Block Causal Mask (M_OBC)**: Cross-attention for</span>
+<span class="sd">            conditional context</span>
+<span class="sd">        - **Block Causal Mask (M_BC)**: Attention to update x0</span>
+<span class="sd">    Args:</span>
+<span class="sd">        b, h: Batch and head indices (ignored for mask logic).</span>
+<span class="sd">        q_idx, kv_idx: Query and Key indices.</span>
+<span class="sd">        block_size: Defines the block structure.</span>
+<span class="sd">        n: Sequence length of x_0 and x_t</span>
+<span class="sd">        Returns:</span>
+<span class="sd">        A boolean attention mask.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Indicate whether token belongs to xt (0) or x0 (1)</span>
+    <span class="n">x0_flag_q</span> <span class="o">=</span> <span class="p">(</span><span class="n">q_idx</span> <span class="o">&gt;=</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">x0_flag_kv</span> <span class="o">=</span> <span class="p">(</span><span class="n">kv_idx</span> <span class="o">&gt;=</span> <span class="n">n</span><span class="p">)</span>
+
+    <span class="c1"># Compute block indices</span>
+    <span class="n">block_q</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x0_flag_q</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span>
+                          <span class="p">(</span><span class="n">q_idx</span> <span class="o">-</span> <span class="n">n</span><span class="p">)</span> <span class="o">//</span> <span class="n">block_size</span><span class="p">,</span>
+                          <span class="n">q_idx</span> <span class="o">//</span> <span class="n">block_size</span><span class="p">)</span>
+    <span class="n">block_kv</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x0_flag_kv</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span>
+                           <span class="p">(</span><span class="n">kv_idx</span> <span class="o">-</span> <span class="n">n</span><span class="p">)</span> <span class="o">//</span> <span class="n">block_size</span><span class="p">,</span>
+                           <span class="n">kv_idx</span> <span class="o">//</span> <span class="n">block_size</span><span class="p">)</span>
+
+    <span class="c1"># **1. Block Diagonal Mask (M_BD) **</span>
+    <span class="n">block_diagonal</span> <span class="o">=</span> <span class="p">(</span><span class="n">block_q</span> <span class="o">==</span> <span class="n">block_kv</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x0_flag_q</span> <span class="o">==</span> <span class="n">x0_flag_kv</span><span class="p">)</span>
+
+    <span class="c1"># **2. Offset Block-Causal Mask (M_OBC) **</span>
+    <span class="n">offset_block_causal</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="n">block_q</span> <span class="o">&gt;</span> <span class="n">block_kv</span><span class="p">)</span>
+        <span class="o">&amp;</span> <span class="p">(</span><span class="n">x0_flag_q</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="o">&amp;</span> <span class="p">(</span><span class="n">x0_flag_kv</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="c1"># **3. Block-Causal Mask (M_BC) **</span>
+    <span class="n">block_causal</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="n">block_q</span> <span class="o">&gt;=</span> <span class="n">block_kv</span><span class="p">)</span>
+        <span class="o">&amp;</span> <span class="p">(</span><span class="n">x0_flag_q</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="o">&amp;</span> <span class="p">(</span><span class="n">x0_flag_kv</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="c1"># **4. Combine Masks **</span>
+    <span class="k">return</span> <span class="n">block_diagonal</span> <span class="o">|</span> <span class="n">offset_block_causal</span> <span class="o">|</span> <span class="n">block_causal</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Attention computation using FlexAttention with our proposed custom mask.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.nn.attention.flex_attention</span><span class="w"> </span><span class="kn">import</span> <span class="n">flex_attention</span><span class="p">,</span> <span class="n">create_block_mask</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+
+<span class="c1"># Define block-wise attention mask</span>
+<span class="n">my_block_diff_mask</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">block_diff_mask</span><span class="p">,</span> <span class="n">seq_len</span><span class="o">=</span><span class="n">seq_len</span><span class="p">,</span> <span class="n">block_size</span><span class="o">=</span><span class="n">block_size</span><span class="p">)</span>
+
+<span class="c1"># Generate optimized sparse block mask</span>
+<span class="n">block_mask</span> <span class="o">=</span> <span class="n">create_block_mask</span><span class="p">(</span>
+    <span class="n">my_block_diff_mask</span><span class="p">,</span>
+    <span class="kc">None</span><span class="p">,</span>         <span class="c1"># batch_size dim</span>
+    <span class="kc">None</span><span class="p">,</span>         <span class="c1"># num_heads dim</span>
+    <span class="n">seq_len</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span>    <span class="c1"># query length</span>
+    <span class="n">seq_len</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span>    <span class="c1"># key/value length</span>
+    <span class="n">device</span><span class="o">=</span><span class="n">device</span>
+<span class="p">)</span>
+
+<span class="c1"># Compute attention using FlexAttention</span>
+<span class="c1"># Use no-cudagraphs to avoid an extra copy on small compile graphs.</span>
+<span class="c1"># Use max-autotune if compiling a larger model all at once.</span>
+<span class="nd">@torch</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">fullgraph</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;max-autotune-no-cudagraphs&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">single_pass_block_diff_attn</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">block_mask</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">flex_attention</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">block_mask</span><span class="o">=</span><span class="n">block_mask</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="random_mask.html" class="btn btn-neutral float-left" title="Discrete Diffusion Model" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../faq/faq.html" class="btn btn-neutral float-right" title="Frequently Asked Questions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, DILAB.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

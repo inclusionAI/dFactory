@@ -1,0 +1,246 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Installation &mdash; dFactory  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=903dac86" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/js/runllm-widget.js"></script>
+      <script src="../_static/js/resizable-sidebar.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Preparation" href="preparation.html" />
+    <link rel="prev" title="dFactory documentation" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            dFactory
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#clone-the-repository">Clone the Repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#environment-setup-and-dependencies">Environment Setup and Dependencies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#option-a-using-uv-recommended">Option A: Using uv (Recommended)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#install-uv">Install uv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#create-environment-and-install-dependencies">Create Environment and Install Dependencies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#activate-environment">Activate Environment</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#option-b-using-pip-and-venv">Option B: Using pip and venv</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#create-virtual-environment">Create Virtual Environment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#activate-virtual-environment">Activate Virtual Environment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#install-project-in-editable-mode">Install Project in Editable Mode</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#next-steps">Next Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="preparation.html">Preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart: SFT upon dFactory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configs.html">Configuration Design Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Train</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/distributed.html">Distributed Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/profiler.html">Profiler</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Inference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../infer/sglang.html">SGLang dLLM Inference Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Algorithms</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../algo/random_mask.html">Discrete Diffusion Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../algo/block_diffusion.html">Block Diffusion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../faq/faq.html">Frequently Asked Questions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">dFactory</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Installation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/start/install.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="installation">
+<span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h1>
+<p>Last updated: 2025-11-8</p>
+<p>This guide will walk you through setting up dFactory and installing
+its dependencies.</p>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Git</p></li>
+<li><p>Python 3.10 or higher</p></li>
+<li><p>CUDA 12.4 or higher</p></li>
+</ul>
+</section>
+<section id="clone-the-repository">
+<h2>Clone the Repository<a class="headerlink" href="#clone-the-repository" title="Link to this heading"></a></h2>
+<p>First, clone the project repository from GitHub. The <code class="docutils literal notranslate"><span class="pre">--recursive</span></code> flag
+is important as it ensures that all necessary submodules are
+downloaded as well.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>--recursive<span class="w"> </span>https://code.alipay.com/xbox/nexus_veomni.git
+<span class="nb">cd</span><span class="w"> </span>nexus_veomni
+</pre></div>
+</div>
+</section>
+<section id="environment-setup-and-dependencies">
+<h2>Environment Setup and Dependencies<a class="headerlink" href="#environment-setup-and-dependencies" title="Link to this heading"></a></h2>
+<p>We offer two methods for installation. We recommend using <strong>uv</strong> for its
+speed, but you can also use <strong>pip</strong> with a standard virtual environment.</p>
+<section id="option-a-using-uv-recommended">
+<h3>Option A: Using uv (Recommended)<a class="headerlink" href="#option-a-using-uv-recommended" title="Link to this heading"></a></h3>
+<p>uv is an extremely fast Python package installer and resolver.</p>
+<section id="install-uv">
+<h4>Install uv<a class="headerlink" href="#install-uv" title="Link to this heading"></a></h4>
+<p>If you don’t have uv installed, run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-LsSf<span class="w"> </span>https://astral.sh/uv/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>sh
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You may need to restart your terminal or source your shell
+profile (<code class="docutils literal notranslate"><span class="pre">source</span> <span class="pre">~/.bashrc</span></code>, <code class="docutils literal notranslate"><span class="pre">source</span> <span class="pre">~/.zshrc</span></code>, etc.) for the uv
+command to become available.</p>
+</div>
+</section>
+<section id="create-environment-and-install-dependencies">
+<h4>Create Environment and Install Dependencies<a class="headerlink" href="#create-environment-and-install-dependencies" title="Link to this heading"></a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">sync</span></code> command will create a virtual environment in the <code class="docutils literal notranslate"><span class="pre">.venv</span></code>
+directory and install all dependencies specified in the <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>
+file. The <code class="docutils literal notranslate"><span class="pre">--extra</span> <span class="pre">gpu</span></code> flag includes packages required for GPU support
+(e.g., PyTorch with CUDA).</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># From VeOmni&#39;s root directory (dFactory/VeOmni)</span>
+uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>gpu
+</pre></div>
+</div>
+</section>
+<section id="activate-environment">
+<h4>Activate Environment<a class="headerlink" href="#activate-environment" title="Link to this heading"></a></h4>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+</pre></div>
+</div>
+<p>Your command prompt should now be prefixed with <code class="docutils literal notranslate"><span class="pre">(.venv)</span></code>, indicating
+that the environment is active.</p>
+</section>
+</section>
+<section id="option-b-using-pip-and-venv">
+<h3>Option B: Using pip and venv<a class="headerlink" href="#option-b-using-pip-and-venv" title="Link to this heading"></a></h3>
+<p>This is the classic approach using Python’s built-in tools.</p>
+<section id="create-virtual-environment">
+<h4>Create Virtual Environment<a class="headerlink" href="#create-virtual-environment" title="Link to this heading"></a></h4>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># From the project root directory (dFactory)</span>
+python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+</pre></div>
+</div>
+</section>
+<section id="activate-virtual-environment">
+<h4>Activate Virtual Environment<a class="headerlink" href="#activate-virtual-environment" title="Link to this heading"></a></h4>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+</pre></div>
+</div>
+</section>
+<section id="install-project-in-editable-mode">
+<h4>Install Project in Editable Mode<a class="headerlink" href="#install-project-in-editable-mode" title="Link to this heading"></a></h4>
+<p>We will install the VeOmni package. The <code class="docutils literal notranslate"><span class="pre">-e</span></code> flag (editable mode)
+allows you to make changes to the source code without needing to
+reinstall. The <code class="docutils literal notranslate"><span class="pre">[gpu]</span></code> part installs the extra dependencies for GPU
+support.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;VeOmni[gpu]&quot;</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="next-steps">
+<h2>Next Steps<a class="headerlink" href="#next-steps" title="Link to this heading"></a></h2>
+<p>You are now ready to use dFactory.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="dFactory documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="preparation.html" class="btn btn-neutral float-right" title="Preparation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, DILAB.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

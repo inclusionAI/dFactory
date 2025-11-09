@@ -1,0 +1,224 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dFactory documentation &mdash; dFactory  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=903dac86" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/js/runllm-widget.js"></script>
+      <script src="_static/js/resizable-sidebar.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="start/install.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            dFactory
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="start/install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="start/preparation.html">Preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="start/quickstart.html">Quickstart: SFT upon dFactory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="start/configs.html">Configuration Design Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Train</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="advanced/distributed.html">Distributed Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced/profiler.html">Profiler</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Inference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="infer/sglang.html">SGLang dLLM Inference Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Algorithms</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="algo/random_mask.html">Discrete Diffusion Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="algo/block_diffusion.html">Block Diffusion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="faq/faq.html">Frequently Asked Questions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">dFactory</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">dFactory documentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="dfactory-documentation">
+<h1>dFactory documentation<a class="headerlink" href="#dfactory-documentation" title="Link to this heading"></a></h1>
+<div class="toctree-wrapper compound" id="contents">
+<p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="start/install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="start/install.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="start/install.html#clone-the-repository">Clone the Repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="start/install.html#environment-setup-and-dependencies">Environment Setup and Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="start/install.html#next-steps">Next Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="start/preparation.html">Preparation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="start/preparation.html#download-and-merge-model-weights">Download and Merge Model Weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="start/preparation.html#prepare-training-data">Prepare Training Data</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="start/quickstart.html">Quickstart: SFT upon dFactory</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="start/quickstart.html#veomni-best-practices">VeOmni Best Practices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="start/quickstart.html#model-and-optimizer">Model and Optimizer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="start/quickstart.html#train-loop">Train Loop</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="start/configs.html">Configuration Design Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="start/configs.html#yaml-configuration-structure">YAML Configuration Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="start/configs.html#model-configuration">Model Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="start/configs.html#data-configuration">Data Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="start/configs.html#training-configuration">Training Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="start/configs.html#configuration-patterns">Configuration Patterns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="start/configs.html#hardware-adaptation">Hardware Adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="start/configs.html#best-practices">Best Practices</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Train</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="advanced/distributed.html">Distributed Training</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="advanced/distributed.html#single-node-multi-gpu-training">Single-Node, Multi-GPU Training</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced/distributed.html#instructions">Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced/distributed.html#multi-node-multi-gpu-training">Multi-Node, Multi-GPU Training</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced/distributed.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced/distributed.html#environment-variables">Environment Variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced/distributed.html#example-for-a-2-node-setup">Example for a 2-Node Setup</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="advanced/profiler.html">Profiler</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Inference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="infer/sglang.html">SGLang dLLM Inference Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="infer/sglang.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="infer/sglang.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="infer/sglang.html#server-launch">Server Launch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="infer/sglang.html#api-usage">API Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="infer/sglang.html#additional-resources">Additional Resources</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Algorithms</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="algo/random_mask.html">Discrete Diffusion Model</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="algo/random_mask.html#random-masking-process-forward-process">Random Masking Process (Forward Process)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algo/random_mask.html#pre-training-objective">Pre-training Objective</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algo/random_mask.html#supervised-fine-tuning-sft">Supervised Fine-tuning (SFT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algo/random_mask.html#inference-the-reverse-denoising-process">Inference: The Reverse Denoising Process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algo/random_mask.html#perplexity-ppl-calculation">Perplexity (PPL) Calculation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="algo/block_diffusion.html">Block Diffusion</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="algo/block_diffusion.html#core-design-rationale">Core Design Rationale</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algo/block_diffusion.html#methodology">Methodology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algo/block_diffusion.html#helper-function-to-create-block-diffusion-mask">Helper Function to Create Block Diffusion Mask</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">FAQ</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="faq/faq.html">Frequently Asked Questions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="faq/faq.html#veomni-related">Veomni related</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/faq.html#install-related">Install related</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/faq.html#evaluation-related">Evaluation related</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="start/install.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, DILAB.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
