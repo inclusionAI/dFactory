@@ -172,40 +172,30 @@ def block_diffusion_mask(b, h, q_idx, kv_idx, block_size=None, n=None):
 
 def compute_confidence_loss(logits: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
     """
-    计算在模型预测正确位置的输出分布的平均熵。
+    Calculate the average entropy of the output distribution at positions where the model predicts correctly.
     Args:
-        logits (torch.Tensor): 模型的原始输出 logits，形状为 (batch_size, seq_len, vocab_size)。
-        labels (torch.Tensor): 真实标签，形状为 (batch_size, seq_len)。-100表示忽略。
+        logits (torch.Tensor): The raw output logits from the model, with shape (batch_size, seq_len, vocab_size).
+        labels (torch.Tensor): The ground truth labels, with shape (batch_size, seq_len). -100 indicates positions to be ignored.
     Returns:
-        torch.Tensor: 一个标量张量，表示 confidence loss。如果没有任何正确预测，则为 0。
+        torch.Tensor: A scalar tensor representing the confidence loss. Returns 0 if there are no correct predictions.
     """
-    # 确保 labels 和 logits 在同一个设备上
     labels = labels.to(logits.device)
     
-    # 步骤 1: 找到所有有效的标签位置
     valid_mask = (labels != -100)
     if not valid_mask.any():
         return torch.tensor(0.0, device=logits.device)
 
-    # 步骤 2: 找到模型在每个位置上概率最高的 token
     predicted_tokens = torch.argmax(logits, dim=-1)
 
-    # 步骤 3: 找到模型预测正确的那些位置 (M_c)
-    # 我们只关心在有效标签位置上是否预测正确
     correct_mask = (predicted_tokens == labels) & valid_mask
 
-    # 如果没有任何一个位置预测正确，那么这个损失为 0
     if correct_mask.sum() == 0:
         return torch.tensor(0.0, device=logits.device)
 
-    # 步骤 4: 计算所有位置的概率分布和熵
-    # 使用 log_softmax 以保证数值稳定性
     log_probs = F.log_softmax(logits, dim=-1)
     probs = torch.exp(log_probs)
-    # 熵的计算公式: H(p) = - sum(p * log(p))
     entropy_per_token = -torch.sum(probs * log_probs, dim=-1)
 
-    # 步骤 5: 筛选出 M_c 位置的熵，并计算平均值
     entropy_at_correct_positions = entropy_per_token[correct_mask]
     
     confidence_loss = entropy_at_correct_positions.mean()
