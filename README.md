@@ -32,8 +32,8 @@
 
 We are actively working on enhancing the project with new features and improvements. Our roadmap for the near future includes:
 
-- [x] **Comprehensive Documentation**: A full documentation site is underway, which will feature in-depth tutorials, API references, and best practices.
-- [ ] **Trainable Parallel Decoding**: Integration of support for trainable parallel decoding to enable more advanced use cases.
+- [☑️] **Comprehensive Documentation**: A full documentation site is underway, which will feature in-depth tutorials, API references, and best practices.
+- [☑️] **Trainable Parallel Decoding**: Integration of support for trainable parallel decoding to enable more advanced use cases.
 
 Stay tuned for these updates!
 
