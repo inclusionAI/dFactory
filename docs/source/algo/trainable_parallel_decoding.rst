@@ -18,7 +18,7 @@ The framework currently supports two complementary techniques:
 Path Distillation (Trajectory Compression)
 ------------------------------------------
 
-Path Distillation is inspired by the observation in `Song et al., 2025 <http://arxiv.org/abs/2508.02193>`_ that training on high-quality generation paths can significantly improve model efficiency. This method consists of two main stages:
+Path Distillation is motivated by the key observation from `Song et al., 2025 <http://arxiv.org/abs/2508.02193>`_ that training on high-quality generation paths can significantly improve model efficiency. The method consists of two main stages:
 
 High-Quality Trajectory Distillation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -70,7 +70,7 @@ The training data format should include:
 DPARALLEL: Learnable Parallel Decoding
 --------------------------------------
 
-`Chen et al., 2025 <http://arxiv.org/abs/2509.26488>`_ is a novel approach that introduces an entropy-based regularization term to the training loss to encourage the model to learn parallel decoding capabilities.
+`Chen et al., 2025 <http://arxiv.org/abs/2509.26488>`_ introduce dParallel, a novel approach that incorporates an entropy-based regularization term into the training loss to encourage parallel decoding capabilities.
 
 Methodology
 ~~~~~~~~~~~
