@@ -70,7 +70,7 @@ The training data format should include:
 DPARALLEL: Learnable Parallel Decoding
 --------------------------------------
 
-DPARALLEL is inspired by the DPARALLEL: Learnable Parallel Decoding for DLLMs approach, which introduces an entropy-based regularization term to the training loss to encourage the model to learn parallel decoding capabilities.
+DPARALLEL: Learnable Parallel Decoding for DLLMs [arXiv:2509.26488] is a novel approach that introduces an entropy-based regularization term to the training loss to encourage the model to learn parallel decoding capabilities.
 
 Methodology
 ~~~~~~~~~~~
@@ -91,6 +91,7 @@ To enable DPARALLEL, use the following training configuration:
     sh train.sh tasks/train_llada2_bd_with_dparallel.py configs/sft/llada2_mini_bd_sft.yaml --train.confidence_beta {confidence_beta}
 
 Where:
+
 - ``confidence_beta`` controls the strength of the entropy regularization (recommended value: 2.0)
 - Higher values encourage more aggressive parallel decoding
 - The parameter balances between generation quality and speed-up
