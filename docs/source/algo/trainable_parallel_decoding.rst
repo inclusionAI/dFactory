@@ -87,6 +87,7 @@ Configuration
 To enable DPARALLEL, use the following training configuration:
 
 .. code:: bash
+
     sh train.sh tasks/train_llada2_bd_with_dparallel.py configs/sft/llada2_mini_bd_sft.yaml --train.confidence_beta {confidence_beta}
 
 Where:
