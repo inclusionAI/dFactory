@@ -6,6 +6,7 @@ from functools import partial
 from typing import Any, Dict, List, Literal, Tuple, Optional
 
 import torch
+import torch.nn.functional as F
 import torch.distributed as dist
 import wandb
 from tqdm import trange
@@ -98,6 +99,10 @@ class LLaDA2TrainingArguments(TrainingArguments):
         default=0.999,
         metadata={"help": "AdamW optimizer beta2"},
     )
+    confidence_beta: float = field(
+        default=0.0,
+        metadata={"help": "Weight for the confidence loss entropy of correct predictions. Set to 0 to disable."},
+    )
     block_diffusion_mode: bool = field(
         default=False,
         metadata={"help": "If train MDM in block_diffusion mode. True: use block_diffusion, False: full_attention"}
@@ -165,7 +170,38 @@ def block_diffusion_mask(b, h, q_idx, kv_idx, block_size=None, n=None):
     # **4. Combine Masks **
     return block_diagonal | offset_block_causal | block_causal
 
+def compute_confidence_loss(logits: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
+    """
+    Calculate the average entropy of the output distribution at positions where the model predicts correctly.
+    Args:
+        logits (torch.Tensor): The raw output logits from the model, with shape (batch_size, seq_len, vocab_size).
+        labels (torch.Tensor): The ground truth labels, with shape (batch_size, seq_len). -100 indicates positions to be ignored.
+    Returns:
+        torch.Tensor: A scalar tensor representing the confidence loss. Returns 0 if there are no correct predictions.
+    """
+    labels = labels.to(logits.device)
+    
+    valid_mask = (labels != -100)
+    if not valid_mask.any():
+        return torch.tensor(0.0, device=logits.device)
 
+    predicted_tokens = torch.argmax(logits, dim=-1)
+
+    correct_mask = (predicted_tokens == labels) & valid_mask
+
+    if correct_mask.sum() == 0:
+        return torch.tensor(0.0, device=logits.device)
+
+    log_probs = F.log_softmax(logits, dim=-1)
+    probs = torch.exp(log_probs)
+    entropy_per_token = -torch.sum(probs * log_probs, dim=-1)
+
+    entropy_at_correct_positions = entropy_per_token[correct_mask]
+    
+    confidence_loss = entropy_at_correct_positions.mean()
+    
+    return confidence_loss
+    
 def main():
     dist.init_process_group(backend=get_nccl_backend())
     args = parse_args(Arguments)
@@ -415,6 +451,10 @@ def main():
             total_loss = 0
             synchronize()
             start_time = time.time()
+            num_accumulation_steps = len(micro_batches)
+            total_consistency_loss = 0
+            total_confidence_loss = 0
+
             for micro_batch in micro_batches:
                 environ_meter.add(micro_batch)
                 if args.data.enable_multisource:
@@ -448,13 +488,20 @@ def main():
                     else:
                         noisy_logits = logits
 
+                    confidence_loss = torch.tensor(0.0, device=noisy_logits.device)
+                    if args.train.confidence_beta > 0:
+                        confidence_loss = compute_confidence_loss(
+                            logits=noisy_logits,
+                            labels=labels,
+                        )
+
                     if args.train.same_token_labels:
                         unscaled_loss = torch.nn.functional.cross_entropy(
                             noisy_logits.view(-1, noisy_logits.shape[-1]),
                             labels.view(-1),
                             reduction="none",
-                        )
-                        loss = unscaled_loss.sum() / (labels != -100).sum() / len(micro_batches)
+                        ).view(noisy_logits.shape[0], -1)
+                        consistency_loss = unscaled_loss.sum() / (labels != -100).sum()
                     else:
                         shifted_noisy_logits = noisy_logits[:, :-1, :].contiguous()
                         shifted_labels = labels[:, 1:].contiguous()
@@ -463,12 +510,16 @@ def main():
                             shifted_labels.view(-1),
                             reduction="none",
                         ).view(shifted_noisy_logits.shape[0], -1)
-                        loss = unscaled_loss.sum() / (shifted_labels != -100).sum() / len(micro_batches)
-
+                        consistency_loss = unscaled_loss.sum() / (shifted_labels != -100).sum()
+                        
+                combined_loss = consistency_loss + confidence_loss * args.train.confidence_beta
+                loss = combined_loss / num_accumulation_steps
                 with model_bwd_context:
                     loss.backward()
 
                 total_loss += loss.item()
+                total_consistency_loss += consistency_loss.item() / num_accumulation_steps
+                total_confidence_loss += confidence_loss.item() / num_accumulation_steps
                 del micro_batch
 
             # Prefer model-provided clip_grad_norm_ (now both FSDP1 and FSDP2 registers custom grad norm clipping)
@@ -494,13 +545,13 @@ def main():
             lr = max(lr_scheduler.get_last_lr())
             train_metrics = environ_meter.step(delta_time, global_step=global_step)
 
-            data_loader_tqdm.set_postfix_str(f"loss: {total_loss:.2f}, grad_norm: {grad_norm:.2f}, lr: {lr:.2e}")
+            data_loader_tqdm.set_postfix_str(f"loss: {total_loss:.2f}, cons: {total_consistency_loss:.2f}, conf: {total_confidence_loss:.2f}, grad_norm: {grad_norm:.2f}, lr: {lr:.2e}")
             data_loader_tqdm.update()
 
             if args.train.global_rank == 0:
                 if args.train.use_wandb:
                     train_metrics.update(
-                        {"training/loss": total_loss, "training/grad_norm": grad_norm, "training/lr": lr}
+                        {"training/loss": total_loss, "training/cons_loss": total_consistency_loss, "training/conf_loss": total_confidence_loss,  "training/grad_norm": grad_norm, "training/lr": lr}
                     )
                     wandb.log(train_metrics, step=global_step)
 
