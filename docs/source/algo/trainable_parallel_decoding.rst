@@ -3,12 +3,12 @@ Trainable Parallel Decoding
 
 Last updated: 2025-11-10
 
-Trainable Parallel Decoding is a novel approach to accelerate Discrete Diffusion Language Models (DDLMs) by learning to decode multiple tokens simultaneously during training, thereby reducing inference latency while maintaining generation quality.
+Trainable Parallel Decoding is a novel approach to accelerate Diffusion Large Language Models (DLLMs) by learning to decode multiple tokens simultaneously during training, thereby reducing inference latency while maintaining generation quality.
 
 Overview
 --------
 
-Traditional DDLMs suffer from high inference latency due to their iterative, multi-step sampling process. Trainable Parallel Decoding addresses this limitation by introducing a second-stage fine-tuning paradigm that teaches the model to predict multiple future tokens in a single forward pass. This approach transforms the sequential generation process into a more parallelizable one, significantly reducing the number of required sampling steps.
+Traditional DLLMs suffer from high inference latency due to their iterative, multi-step sampling process. Trainable Parallel Decoding addresses this limitation by introducing a second-stage fine-tuning paradigm that teaches the model to predict multiple future tokens in a single forward pass. This approach transforms the sequential generation process into a more parallelizable one, significantly reducing the number of required sampling steps.
 
 The framework currently supports two complementary techniques:
 
@@ -70,7 +70,7 @@ The training data format should include:
 DPARALLEL: Learnable Parallel Decoding
 --------------------------------------
 
-DPARALLEL is inspired by the DPARALLEL: Learnable Parallel Decoding for DDLMs approach, which introduces an entropy-based regularization term to the training loss to encourage the model to learn parallel decoding capabilities.
+DPARALLEL is inspired by the DPARALLEL: Learnable Parallel Decoding for DLLMs approach, which introduces an entropy-based regularization term to the training loss to encourage the model to learn parallel decoding capabilities.
 
 Methodology
 ~~~~~~~~~~~
