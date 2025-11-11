@@ -25,7 +25,7 @@ High-Quality Trajectory Distillation
 
 The first stage involves creating a dataset of "golden" trajectories through the following process:
 
-1. **Trajectory Generation**: Use a pre-trained DDLM to sample generation paths on a domain-specific dataset (e.g., 200,000 math problems)
+1. **Trajectory Generation**: Use a pre-trained DLLM to sample generation paths on a domain-specific dataset (e.g., 200,000 math problems)
 2. **Quality Filtering**: Apply an external verifier to filter trajectories that produce correct outputs
 3. **Dataset Construction**: Retain only high-quality trajectories that pass verification
 
