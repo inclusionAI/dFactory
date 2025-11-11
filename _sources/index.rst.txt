@@ -37,6 +37,7 @@ dFactory documentation
 
    algo/random_mask
    algo/block_diffusion
+   algo/trainable_parallel_decoding
 
 
 .. toctree::

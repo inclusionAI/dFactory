@@ -1,0 +1,246 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trainable Parallel Decoding &mdash; dFactory  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=903dac86" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../_static/js/runllm-widget.js"></script>
+      <script src="../_static/js/resizable-sidebar.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Frequently Asked Questions" href="../faq/faq.html" />
+    <link rel="prev" title="Block Diffusion" href="block_diffusion.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            dFactory
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../start/install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/preparation.html">Preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/quickstart.html">Quickstart: SFT upon dFactory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../start/configs.html">Configuration Design Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Train</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/distributed.html">Distributed Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/profiler.html">Profiler</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Inference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../infer/sglang.html">SGLang dLLM Inference Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Algorithms</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="random_mask.html">Discrete Diffusion Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="block_diffusion.html">Block Diffusion</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Trainable Parallel Decoding</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#path-distillation-trajectory-compression">Path Distillation (Trajectory Compression)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#high-quality-trajectory-distillation">High-Quality Trajectory Distillation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compressed-transition-learning">Compressed Transition Learning</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#implementation-details">Implementation Details</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#dparallel-learnable-parallel-decoding">DPARALLEL: Learnable Parallel Decoding</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#methodology">Methodology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuration">Configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#training-process">Training Process</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../faq/faq.html">Frequently Asked Questions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">dFactory</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Trainable Parallel Decoding</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/algo/trainable_parallel_decoding.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="trainable-parallel-decoding">
+<h1>Trainable Parallel Decoding<a class="headerlink" href="#trainable-parallel-decoding" title="Link to this heading"></a></h1>
+<p>Last updated: 2025-11-10</p>
+<p>Trainable Parallel Decoding is a novel approach to accelerate Diffusion Large Language Models (DLLMs) by learning to decode multiple tokens simultaneously during training, thereby reducing inference latency while maintaining generation quality.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>Traditional DLLMs suffer from high inference latency due to their iterative, multi-step sampling process. Trainable Parallel Decoding addresses this limitation by introducing a second-stage fine-tuning paradigm that teaches the model to predict multiple future tokens in a single forward pass. This approach transforms the sequential generation process into a more parallelizable one, significantly reducing the number of required sampling steps.</p>
+<p>The framework currently supports two complementary techniques:</p>
+<ol class="arabic simple">
+<li><p><strong>Path Distillation (Trajectory Compression)</strong>: Learning to jump between non-consecutive states in optimal generation trajectories</p></li>
+<li><p><strong>DPARALLEL</strong>: Entropy-based loss regularization to accelerate parallel decoding learning</p></li>
+</ol>
+</section>
+<section id="path-distillation-trajectory-compression">
+<h2>Path Distillation (Trajectory Compression)<a class="headerlink" href="#path-distillation-trajectory-compression" title="Link to this heading"></a></h2>
+<p>Path Distillation is motivated by the key observation from <a class="reference external" href="http://arxiv.org/abs/2508.02193">Song et al., 2025</a> that training on high-quality generation paths can significantly improve model efficiency. The method consists of two main stages:</p>
+<section id="high-quality-trajectory-distillation">
+<h3>High-Quality Trajectory Distillation<a class="headerlink" href="#high-quality-trajectory-distillation" title="Link to this heading"></a></h3>
+<p>The first stage involves creating a dataset of “golden” trajectories through the following process:</p>
+<ol class="arabic simple">
+<li><p><strong>Trajectory Generation</strong>: Use a pre-trained DLLM to sample generation paths on a domain-specific dataset (e.g., 200,000 math problems)</p></li>
+<li><p><strong>Quality Filtering</strong>: Apply an external verifier to filter trajectories that produce correct outputs</p></li>
+<li><p><strong>Dataset Construction</strong>: Retain only high-quality trajectories that pass verification</p></li>
+</ol>
+<p>Mathematically, given a trajectory <span class="math notranslate nohighlight">\(\tau = (s_N, s_{N-1}, \dots, s_0)\)</span> representing states from fully masked to final output, we filter:</p>
+<div class="math notranslate nohighlight">
+\[\mathcal{T}_{\text{gold}} = \{ \tau \in \mathcal{T} \,|\, V(s_0^{\tau}) = \text{True} \}\]</div>
+<p>where <span class="math notranslate nohighlight">\(V(\cdot)\)</span> is the external verifier function.</p>
+</section>
+<section id="compressed-transition-learning">
+<h3>Compressed Transition Learning<a class="headerlink" href="#compressed-transition-learning" title="Link to this heading"></a></h3>
+<p>The second stage fine-tunes the model to predict multi-step transitions instead of single-step ones:</p>
+<ol class="arabic simple">
+<li><p><strong>Training Instance Construction</strong>: For each trajectory, randomly sample timestamps <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> where <span class="math notranslate nohighlight">\(N \ge i &gt; j \ge 0\)</span></p></li>
+<li><p><strong>Target Identification</strong>: The model learns to predict tokens that are [MASK] in <span class="math notranslate nohighlight">\(s_i\)</span> but revealed in <span class="math notranslate nohighlight">\(s_j\)</span></p></li>
+<li><p><strong>Loss Optimization</strong>: Minimize the negative log-likelihood of compressed transitions</p></li>
+</ol>
+<p>The fine-tuning objective is:</p>
+<div class="math notranslate nohighlight">
+\[\mathcal{L}_{\text{compress}}(\theta) = - \mathbb{E}_{\tau \in \mathcal{T}_{\text{gold}}, \, i,j \sim U(\tau)} \left[ \sum_{k \in \Delta_{i \to j}} \log p_\theta(x_k = s_j[k] \,|\, s_i) \right]\]</div>
+<p>where <span class="math notranslate nohighlight">\(\Delta_{i \to j} = M_i \setminus M_j\)</span> represents the indices of tokens to be predicted.</p>
+<section id="implementation-details">
+<h4>Implementation Details<a class="headerlink" href="#implementation-details" title="Link to this heading"></a></h4>
+<p>The data preparation process involves:</p>
+<ol class="arabic simple">
+<li><p><strong>Offline Dataset Creation</strong>: Generate and filter trajectories offline</p></li>
+<li><p><strong>Data Format</strong>: Prepare input_ids, noisy_input_ids, and labels for training</p></li>
+<li><p><strong>Training Configuration</strong>: Use standard SFT training with the compressed transition objective</p></li>
+</ol>
+<p>The training data format should include:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">input_ids</span></code>: The starting state <span class="math notranslate nohighlight">\(s_i\)</span> with appropriate masking</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">noisy_input_ids</span></code>: The noised version of <span class="math notranslate nohighlight">\(s_i\)</span></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">labels</span></code>: The target tokens to predict (tokens in <span class="math notranslate nohighlight">\(s_j\)</span> that differ from <span class="math notranslate nohighlight">\(s_i\)</span>)</p></li>
+</ul>
+</section>
+</section>
+</section>
+<section id="dparallel-learnable-parallel-decoding">
+<h2>DPARALLEL: Learnable Parallel Decoding<a class="headerlink" href="#dparallel-learnable-parallel-decoding" title="Link to this heading"></a></h2>
+<p><a class="reference external" href="http://arxiv.org/abs/2509.26488">Chen et al., 2025</a> introduce dParallel, a novel approach that incorporates an entropy-based regularization term into the training loss to encourage parallel decoding capabilities.</p>
+<section id="methodology">
+<h3>Methodology<a class="headerlink" href="#methodology" title="Link to this heading"></a></h3>
+<p>The key insight is that by adding a confidence-based loss term during supervised fine-tuning, we can guide the model toward making confident, parallel predictions. This is achieved through:</p>
+<ol class="arabic simple">
+<li><p><strong>Entropy Regularization</strong>: Add a loss term based on the entropy of the model’s predictions</p></li>
+<li><p><strong>Confidence Scoring</strong>: Use prediction confidence as a signal for parallel decoding quality</p></li>
+<li><p><strong>Loss Balancing</strong>: Combine the standard cross-entropy loss with the confidence-based term</p></li>
+</ol>
+</section>
+<section id="configuration">
+<h3>Configuration<a class="headerlink" href="#configuration" title="Link to this heading"></a></h3>
+<p>To enable DPARALLEL, use the following training configuration:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sh<span class="w"> </span>train.sh<span class="w"> </span>tasks/train_llada2_bd_with_dparallel.py<span class="w"> </span>configs/sft/llada2_mini_bd_sft.yaml<span class="w"> </span>--train.confidence_beta<span class="w"> </span><span class="o">{</span>confidence_beta<span class="o">}</span>
+</pre></div>
+</div>
+<p>Where:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">confidence_beta</span></code> controls the strength of the entropy regularization (recommended value: 2.0)</p></li>
+<li><p>Higher values encourage more aggressive parallel decoding</p></li>
+<li><p>The parameter balances between generation quality and speed-up</p></li>
+</ul>
+<section id="training-process">
+<h4>Training Process<a class="headerlink" href="#training-process" title="Link to this heading"></a></h4>
+<p>The DPARALLEL training process:</p>
+<ol class="arabic simple">
+<li><p><strong>Standard SFT Setup</strong>: Begin with standard supervised fine-tuning</p></li>
+<li><p><strong>Loss Modification</strong>: Add the confidence-based regularization term</p></li>
+<li><p><strong>Hyperparameter Tuning</strong>: Adjust <code class="docutils literal notranslate"><span class="pre">confidence_beta</span></code> based on desired speed-quality trade-off</p></li>
+<li><p><strong>Evaluation</strong>: Monitor both generation quality and inference speed metrics</p></li>
+</ol>
+</section>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="block_diffusion.html" class="btn btn-neutral float-left" title="Block Diffusion" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../faq/faq.html" class="btn btn-neutral float-right" title="Frequently Asked Questions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, DILAB.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
