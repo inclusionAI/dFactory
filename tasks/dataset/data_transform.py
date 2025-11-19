@@ -34,8 +34,8 @@ def process_mdm_sft_example(
     noisy_input_ids = sft_noise_transition(
         input_ids.clone(), 
         noise_range=noise_range, 
+        mask_token_id=mask_token_id,
         maskable_mask=maskable_mask, 
-        mask_token_id=mask_token_id
     )
 
     loss_mask = noisy_input_ids == mask_token_id
@@ -83,8 +83,8 @@ def process_mdm_tokenized_example(
     noisy_input_ids = sft_noise_transition(
         input_ids.clone(), 
         noise_range=noise_range, 
+        mask_token_id=mask_token_id,
         maskable_mask=maskable_mask, 
-        mask_token_id=mask_token_id
     )
 
     loss_mask = noisy_input_ids == mask_token_id
@@ -103,8 +103,8 @@ def process_mdm_tokenized_example(
 def sft_noise_transition(
     x_0: torch.Tensor,
     noise_range: tuple[float, float],
-    maskable_mask: torch.Tensor,
     mask_token_id: int,
+    maskable_mask: torch.Tensor | None = None,
 ) -> torch.Tensor:
     """
     Performs a noise transition by masking tokens.
@@ -112,12 +112,16 @@ def sft_noise_transition(
     Args:
         x_0 (torch.Tensor): The input sequence (batch_size, seq_len).
         noise_range (tuple): A tuple (min, max) for the noise range, from which the masking ratio sigma is sampled.
-        maskable_mask (torch.Tensor): A boolean mask indicating which positions are allowed to be masked (batch_size, seq_len).
         mask_token_id (int): The ID of the mask token.
+        maskable_mask (torch.Tensor | None): A boolean mask indicating which positions are
+            allowed to be masked (batch_size, seq_len). If None, all positions are considered
+            maskable. Defaults to None.
 
     Returns:
         torch.Tensor: The sequence after masking.
     """
+    if maskable_mask is None:
+        maskable_mask = torch.ones_like(x_0, dtype=torch.bool)
 
     t_tensor = torch.rand(1) * (noise_range[1] - noise_range[0]) + noise_range[0]
     sigma = t_tensor.item()
