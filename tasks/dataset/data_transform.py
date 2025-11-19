@@ -1,5 +1,6 @@
+from typing import  Any, Dict, List, Optional, Union, Tuple
+
 import torch
-from typing import  Any, Dict, List, Optional, Sequence, Union, Tuple
 
 def process_mdm_sft_example(
     example: Dict[str, Any],
@@ -99,7 +100,12 @@ def process_mdm_tokenized_example(
     return examples
 
 
-def sft_noise_transition(x_0, noise_range, maskable_mask, mask_token_id):
+def sft_noise_transition(
+    x_0: torch.Tensor,
+    noise_range: tuple[float, float],
+    maskable_mask: torch.Tensor,
+    mask_token_id: int,
+) -> torch.Tensor:
     """
     Performs a noise transition by masking tokens.
 
@@ -120,6 +126,7 @@ def sft_noise_transition(x_0, noise_range, maskable_mask, mask_token_id):
     move_indices = (torch.rand(*x_0.shape) < move_chance) & maskable_mask
     x_t = torch.where(move_indices, mask_token_id, x_0)
     return x_t
+
 
 def apply_chat_template_mdm(messages, tokenizer, max_length):
     inputs_str = tokenizer.apply_chat_template(messages, tokenize=False)
