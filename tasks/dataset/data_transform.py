@@ -121,10 +121,10 @@ def sft_noise_transition(
 
     t_tensor = torch.rand(1) * (noise_range[1] - noise_range[0]) + noise_range[0]
     sigma = t_tensor.item()
-    # move_chance = 1 - (-sigma).exp()
-    move_chance = sigma
-    move_indices = (torch.rand(*x_0.shape) < move_chance) & maskable_mask
-    x_t = torch.where(move_indices, mask_token_id, x_0)
+    # mask_prob = 1 - (-sigma).exp()
+    mask_prob = sigma
+    mask_indices = (torch.rand(*x_0.shape) < mask_prob) & maskable_mask
+    x_t = torch.where(mask_indices, mask_token_id, x_0)
     return x_t
 
 
