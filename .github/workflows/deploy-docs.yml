@@ -15,7 +15,7 @@ jobs:
       contents: write
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           # See <https://github.com/mkdocs/mkdocs/issues/2370#issuecomment-821926264>
           fetch-depth: 0
