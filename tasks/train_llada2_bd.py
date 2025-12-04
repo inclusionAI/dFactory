@@ -421,10 +421,6 @@ def main():
                     micro_batch.pop("ds_idx", None)
                     micro_batch.pop("source_name", None)
 
-                micro_batch = {
-                    k: v.to(get_device_type(), non_blocking=True) if isinstance(v, torch.Tensor) else v
-                    for k, v in micro_batch.items()
-                }
                 if args.train.block_diffusion_mode:
                     noisy_input_ids = micro_batch["noisy_input_ids"]
                     clean_input_ids = micro_batch["input_ids"]
@@ -438,6 +434,11 @@ def main():
                     micro_batch["attention_mask"] = block_diffusion_attn_mask_prototype.expand(batch_size, -1, -1, -1)
                 else:
                     micro_batch["attention_mask"] = None
+
+                micro_batch = {
+                    k: v.to(get_device_type(), non_blocking=True) if isinstance(v, torch.Tensor) else v
+                    for k, v in micro_batch.items()
+                }
 
                 labels = micro_batch.pop("labels", None)
 
