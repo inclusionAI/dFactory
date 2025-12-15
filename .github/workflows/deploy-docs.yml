@@ -27,7 +27,7 @@ jobs:
           docs-folder: "docs/"
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: html-docs
           path: docs/_build/html/
