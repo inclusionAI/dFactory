@@ -25,10 +25,11 @@
 
 | Model ID | Description | Size | Config Path | Hugging Face Link |
 | --- | --- | --- | --- | --- |
-| `inclusionAI/LLaDA2.0-mini-preview` | Instruction-tuned model, ready for downstream applications. | 16B | `configs/model_configs/llada2_mini/` | [🤗 Model Card](https://huggingface.co/inclusionAI/LLaDA2.0-mini-preview) |
 | `inclusionAI/LLaDA2.0-mini` | Instruction-tuned model, ready for downstream applications. | 16B | `configs/model_configs/llada2_mini/` | [🤗 Model Card](https://huggingface.co/inclusionAI/LLaDA2.0-mini) |
-| `inclusionAI/LLaDA2.0-flash-preview` | Instruction-tuned model, ready for downstream applications. | 100B | `configs/model_configs/llada2_flash/` | [🤗 Model Card](https://huggingface.co/inclusionAI/LLaDA2.0-flash-preview) |
 | `inclusionAI/LLaDA2.0-flash` | Instruction-tuned model, ready for downstream applications. | 100B | `configs/model_configs/llada2_flash/` | [🤗 Model Card](https://huggingface.co/inclusionAI/LLaDA2.0-flash) |
+| `inclusionAI/LLaDA2.1-mini` | Coming Soon. | 16B | `configs/model_configs/llada2_mini/` | [🤗 Model Card](https://huggingface.co/inclusionAI/LLaDA2.1-mini) |
+| `inclusionAI/LLaDA2.1-flash` | Coming Soon. | 16B | `configs/model_configs/llada2_flash/` | [🤗 Model Card](https://huggingface.co/inclusionAI/LLaDA2.1-flash) |
+| `inclusionAI/LLaDA2.2-flash` | Coming Soon. | 16B | `configs/model_configs/llada2_flash/` | [🤗 Model Card](https://huggingface.co/inclusionAI/LLaDA2.2-flash) |
 
 ## TODO
 
