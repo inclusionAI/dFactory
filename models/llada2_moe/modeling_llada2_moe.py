@@ -43,21 +43,35 @@ from transformers.modeling_outputs import (
 )
 from transformers.modeling_rope_utils import ROPE_INIT_FUNCTIONS, dynamic_rope_update
 from transformers.modeling_utils import PreTrainedModel, ALL_ATTENTION_FUNCTIONS
-from transformers.pytorch_utils import ALL_LAYERNORM_LAYERS, is_torch_greater_or_equal_than_1_13
+from transformers.pytorch_utils import ALL_LAYERNORM_LAYERS
+try:
+    from transformers.pytorch_utils import is_torch_greater_or_equal_than_1_13
+except ImportError:
+    def is_torch_greater_or_equal_than_1_13():
+        return True
 from transformers.utils import (
     add_start_docstrings,
     add_start_docstrings_to_model_forward,
     replace_return_docstrings,
 )
-from transformers.utils.import_utils import is_torch_fx_available
+try:
+    from transformers.utils.import_utils import is_torch_fx_available
+except ImportError:
+    def is_torch_fx_available():
+        return True
 from .configuration_llada2_moe import LLaDA2MoeConfig
 from transformers.generation.utils import GenerationMixin
-from veomni.ops import causallm_loss_function, fused_moe_forward
+from veomni.ops import fused_moe_forward
 from veomni.distributed.parallel_state import get_parallel_state
-from veomni.utils.import_utils import is_liger_kernel_available
+from veomni.utils.import_utils import is_liger_kernel_available, is_torch_npu_available
 from veomni.utils import logging
 
-if is_liger_kernel_available():
+
+def _liger_kernel_enabled():
+    return is_liger_kernel_available() and not is_torch_npu_available()
+
+
+if _liger_kernel_enabled():
     from liger_kernel.ops.swiglu import LigerSiLUMulFunction
     from liger_kernel.transformers.rms_norm import LigerRMSNorm
     from liger_kernel.transformers.rope import liger_rotary_pos_emb
@@ -74,6 +88,40 @@ if is_torch_fx_available():
 logger = logging.get_logger(__name__)
 
 _CONFIG_FOR_DOC = "LLaDA2MoeConfig"
+_LLADA2_MOE_OPS_PATCHED_IMPL = None
+
+
+def _apply_llada2_moe_ops_config():
+    global _LLADA2_MOE_OPS_PATCHED_IMPL
+
+    try:
+        from veomni.ops.config.singleton import get_ops_config
+        from veomni.ops.kernels.moe import apply_veomni_fused_moe_patch
+    except Exception:
+        return
+
+    ops_config = get_ops_config()
+    if ops_config is None:
+        return
+
+    moe_impl = getattr(ops_config, "moe_implementation", "eager")
+    if moe_impl == "eager" or moe_impl == _LLADA2_MOE_OPS_PATCHED_IMPL:
+        return
+
+    apply_veomni_fused_moe_patch(fused_moe_kernel=moe_impl.removeprefix("fused_"))
+    _LLADA2_MOE_OPS_PATCHED_IMPL = moe_impl
+
+
+def _get_llada2_moe_implementation():
+    try:
+        from veomni.ops.config.singleton import get_ops_config
+    except Exception:
+        return "eager"
+
+    ops_config = get_ops_config()
+    if ops_config is None:
+        return "eager"
+    return getattr(ops_config, "moe_implementation", "eager")
 
 
 def _get_unpad_data(attention_mask):
@@ -108,6 +156,24 @@ class LLaDA2MoeRMSNorm(nn.Module):
 ALL_LAYERNORM_LAYERS.append(LLaDA2MoeRMSNorm)
 
 
+def _llada2_default_rope_init(config: LLaDA2MoeConfig, device=None):
+    head_dim = getattr(config, "head_dim", config.hidden_size // config.num_attention_heads)
+    partial_rotary_factor = getattr(config, "partial_rotary_factor", 1.0)
+    dim = int(head_dim * partial_rotary_factor)
+    inv_freq = 1.0 / (
+        config.rope_theta ** (torch.arange(0, dim, 2, dtype=torch.int64, device=device).float() / dim)
+    )
+    return inv_freq, 1.0
+
+
+def _get_rope_init_fn(rope_type: str):
+    if rope_type in ROPE_INIT_FUNCTIONS:
+        return ROPE_INIT_FUNCTIONS[rope_type]
+    if rope_type == "default":
+        return _llada2_default_rope_init
+    raise KeyError(rope_type)
+
+
 class LLaDA2MoeRotaryEmbedding(nn.Module):
     def __init__(self, config: LLaDA2MoeConfig, device=None):
         super().__init__()
@@ -120,7 +186,7 @@ class LLaDA2MoeRotaryEmbedding(nn.Module):
         self.original_max_seq_len = config.max_position_embeddings
 
         self.config = config
-        self.rope_init_fn = ROPE_INIT_FUNCTIONS[self.rope_type]
+        self.rope_init_fn = _get_rope_init_fn(self.rope_type)
 
         inv_freq, self.attention_scaling = self.rope_init_fn(self.config, device)
         self.register_buffer("inv_freq", inv_freq, persistent=False)
@@ -202,7 +268,7 @@ class LLaDA2MoeMLP(nn.Module):
         self.act_fn = ACT2FN[config.hidden_act]
 
     def forward(self, x):
-        if is_liger_kernel_available():
+        if _liger_kernel_enabled():
             return self.down_proj(LigerSiLUMulFunction.apply(self.gate_proj(x), self.up_proj(x)))
         else:
             return self.down_proj(self.act_fn(self.gate_proj(x)) * self.up_proj(x))
@@ -275,6 +341,7 @@ class LLaDA2MoeGate(nn.Module):
 class LLaDA2MoeExperts(nn.Module):
     def __init__(self, config):
         super().__init__()
+        _apply_llada2_moe_ops_config()
         self.num_experts = config.num_experts
         self.hidden_dim = config.hidden_size
         self.intermediate_size = config.moe_intermediate_size
@@ -306,9 +373,8 @@ class LLaDA2MoeExperts(nn.Module):
             )
 
             out = fused_moe_forward(
-                module=self,
                 num_experts=self.num_experts,
-                routing_weights=routing_weights,
+                routing_weights=routing_weights.to(hidden_states.dtype),
                 selected_experts=selected_experts,
                 hidden_states=hidden_states,
                 fc1_1_weight=self.gate_proj,
@@ -343,7 +409,7 @@ class LLaDA2MoeSparseMoeBlock(nn.Module):
             self._setup_experts()
 
         self.gate = LLaDA2MoeGate(config)
-        if config.num_shared_experts is not None:
+        if config.num_shared_experts:
             self.shared_experts = LLaDA2MoeMLP(
                 config=config, intermediate_size=config.moe_intermediate_size * config.num_shared_experts
             )
@@ -364,12 +430,23 @@ class LLaDA2MoeSparseMoeBlock(nn.Module):
         bsz, seq_len, h = hidden_states.shape
         topk_idx, topk_weight, router_logits = self.gate(hidden_states)
         hidden_states = hidden_states.view(-1, hidden_states.shape[-1])
-        y = self.experts(
-            hidden_states, routing_weights=topk_weight, selected_experts=topk_idx
-        ).reshape(bsz, seq_len, h)
-        if self.config.num_shared_experts is not None:
+        if _get_llada2_moe_implementation() == "eager":
+            y = self._stacked_experts_eager_forward(hidden_states, topk_idx, topk_weight).reshape(bsz, seq_len, h)
+        else:
+            y = self.experts(
+                hidden_states, routing_weights=topk_weight, selected_experts=topk_idx
+            ).reshape(bsz, seq_len, h)
+        if self.config.num_shared_experts:
             y = y + self.shared_experts(identity)
         return y, (router_logits.view(bsz, seq_len, -1), topk_idx.view(bsz, seq_len, -1))
+
+    def _stacked_experts_eager_forward(self, hidden_states, topk_idx, topk_weight):
+        flat_topk_idx = topk_idx.view(-1)
+        hidden_states = hidden_states.repeat_interleave(self.num_experts_per_tok, dim=0)
+        y = torch.empty_like(hidden_states)
+        for i in range(self.config.num_experts):
+            y[flat_topk_idx == i] = self.experts(hidden_states[flat_topk_idx == i], expert_idx=i)
+        return (y.view(*topk_weight.shape, -1) * topk_weight.unsqueeze(-1)).sum(dim=1).to(hidden_states.dtype)
 
     def _forward(self, hidden_states):
         identity = hidden_states
@@ -386,7 +463,7 @@ class LLaDA2MoeSparseMoeBlock(nn.Module):
             y = y.to(hidden_states.dtype).view(bsz, seq_len, h)
         else:
             y = self.moe_infer(hidden_states, topk_idx, topk_weight).view(bsz, seq_len, h)
-        if self.config.num_shared_experts is not None:
+        if self.config.num_shared_experts:
             y = y + self.shared_experts(identity)
         return y, (router_logits.view(bsz, seq_len, -1), topk_idx.view(bsz, seq_len, -1))
 
@@ -1566,7 +1643,7 @@ def apply_rotary_pos_emb_llada2_moe(q, k, cos, sin, position_ids, unsqueeze_dim=
     return q_embed, k_embed
 
 
-if is_liger_kernel_available():
+if _liger_kernel_enabled():
     apply_rotary_pos_emb = apply_rotary_pos_emb_llada2_moe
     LLaDA2MoeRMSNorm = LigerRMSNorm
     logger.info_rank0("Apply liger kernel to LLaDA2Moe")

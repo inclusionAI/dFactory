@@ -2,58 +2,75 @@ model:
   config_path: ./configs/model_configs/llada2_mini
   model_path: ./LLaDA2.0-mini-preview-moe-merge
   tokenizer_path: ./LLaDA2.0-mini-preview-moe-merge
-  attn_implementation: sdpa
-  moe_implementation: fused
+  ops_implementation:
+    attn_implementation: sdpa
+    moe_implementation: fused_triton
+    cross_entropy_loss_implementation: eager
+    rms_norm_implementation: eager
+    swiglu_mlp_implementation: eager
+    rotary_pos_emb_implementation: eager
+    rotary_pos_emb_vision_implementation: eager
+    load_balancing_loss_implementation: eager
+    rms_norm_gated_implementation: eager
+    causal_conv1d_implementation: eager
+    chunk_gated_delta_rule_implementation: eager
 
 data:
   train_path: ./gsm8k_datasets/gsm8k_train.jsonl
   data_type: conversation
   datasets_type: mapping
-  dataloader_type: native
   max_seq_len: 2048
   text_keys: messages
   noise_range_low: 0.3
   noise_range_high: 0.8
-  num_workers: 16
+  dataloader:
+    type: native
+    num_workers: 16
+    drop_last: true
+    pin_memory: true
 
 train:
-  output_dir: ./llada2_mini_bd_sft_outputs
-  data_parallel_mode: fsdp2
-  tensor_parallel_size: 1
-  ulysses_parallel_size: 1
-  expert_parallel_size: 1
+  dyn_bsz: false
   global_batch_size: 8
   micro_batch_size: 1
   num_train_epochs: 1
-  rmpad: false
-  rmpad_with_pos_ids: false
   bsz_warmup_ratio: 0.007
-  dyn_bsz_margin: 0
-  dyn_bsz_buffer_size: 200
-  optimizer: adamw
-  beta1: 0.9
-  beta2: 0.999
-  lr: 1.0e-5
-  lr_warmup_ratio: 0.03
-  lr_decay_style: cosine
-  lr_decay_ratio: 1.0
-  weight_decay: 0.1
-  max_grad_norm: 1.0
-  enable_mixed_precision: true
-  enable_gradient_checkpointing: true
-  enable_full_shard: true
-  enable_fsdp_offload: true
-  enable_activation_offload: false
   init_device: meta
   broadcast_model_weights_from_rank0: true
   enable_full_determinism: false
   empty_cache_steps: 500
-  ckpt_manager: dcp
-  load_checkpoint_path: ""
-  save_epochs: 1
-  save_hf_weights: true
+  beta1: 0.9
+  beta2: 0.999
   block_diffusion_mode: true
   block_size: 32
   same_token_labels: true
-  use_wandb: false  # or you can set `wandb_project` and `wandb_name` to trace your training
-  log_steps: 1
+  optimizer:
+    type: adamw
+    lr: 1.0e-5
+    lr_warmup_ratio: 0.03
+    lr_decay_style: cosine
+    lr_decay_ratio: 1.0
+    weight_decay: 0.1
+    max_grad_norm: 1.0
+  accelerator:
+    tp_size: 1
+    ep_size: 1
+    pp_size: 1
+    ulysses_size: 1
+    cp_size: 1
+    fsdp_config:
+      fsdp_mode: fsdp2
+      offload: true
+      mixed_precision:
+        enable: true
+  gradient_checkpointing:
+    enable: true
+    enable_reentrant: false
+  checkpoint:
+    output_dir: ./llada2_mini_bd_sft_outputs
+    manager: dcp
+    load_path: null
+    save_epochs: 1
+    save_hf_weights: true
+  wandb:
+    enable: false

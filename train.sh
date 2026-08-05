@@ -6,7 +6,16 @@ export TOKENIZERS_PARALLELISM=false
 export TORCH_NCCL_AVOID_RECORD_STREAMS=1
 
 NNODES=${NNODES:=1}
-NPROC_PER_NODE=${NPROC_PER_NODE:=$(nvidia-smi --list-gpus | wc -l)}
+if [[ -z "${NPROC_PER_NODE:-}" ]]; then
+  if command -v nvidia-smi >/dev/null 2>&1; then
+    NPROC_PER_NODE=$(nvidia-smi --list-gpus | wc -l | tr -d ' ')
+  elif command -v npu-smi >/dev/null 2>&1; then
+    NPROC_PER_NODE=$(npu-smi info 2>/dev/null | awk '/^[[:space:]]*[0-9]+[[:space:]]+[0-9]+/ {print $1}' | sort -u | wc -l | tr -d ' ')
+    [[ "$NPROC_PER_NODE" == "0" ]] && NPROC_PER_NODE=1
+  else
+    NPROC_PER_NODE=1
+  fi
+fi
 NODE_RANK=${NODE_RANK:=0}
 MASTER_ADDR=${MASTER_ADDR:=0.0.0.0}
 MASTER_PORT=${MASTER_PORT:=12345}
