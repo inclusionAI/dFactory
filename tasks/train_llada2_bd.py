@@ -32,7 +32,7 @@ from veomni.utils.device import (
 from veomni.utils.dist_utils import all_reduce
 from veomni.models.registry import ModelRegistry
 ModelRegistry.register_modeling_path("models.llada2_moe")
-from dataset.data_transform import process_mdm_tokenized_example, process_mdm_sft_example
+from dataset.data_transform import process_mdm_tokenized_example, process_mdm_sft_example, full_attention_inputs
 from dataset import build_local_dataset
 
 
@@ -433,7 +433,7 @@ def main():
                     micro_batch["position_ids"] = position_ids
                     micro_batch["attention_mask"] = block_diffusion_attn_mask_prototype.expand(batch_size, -1, -1, -1)
                 else:
-                    micro_batch["attention_mask"] = None
+                    micro_batch = full_attention_inputs(micro_batch)
 
                 micro_batch = {
                     k: v.to(get_device_type(), non_blocking=True) if isinstance(v, torch.Tensor) else v

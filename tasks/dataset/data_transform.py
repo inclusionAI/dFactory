@@ -138,3 +138,17 @@ def apply_chat_template_mdm(messages, tokenizer, max_length):
     ).input_ids.squeeze(0)
 
     return tokenized_input, prompt_length
+
+
+def full_attention_inputs(micro_batch: Dict[str, "torch.Tensor"]) -> Dict[str, "torch.Tensor"]:
+    """
+    Prepares a collated micro batch for full-attention training (`block_diffusion_mode: false`).
+
+    Args:
+        micro_batch (dict): The collated output of the transforms above.
+
+    Returns:
+        dict: The model inputs. Every position attends to every position, so there is no attention mask.
+    """
+    micro_batch["attention_mask"] = None
+    return micro_batch
