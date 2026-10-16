@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [develop]
+
+jobs:
+  quality:
+    runs-on: [self-hosted, linux, x64, cuda, multi-gpu]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - name: Install locked CUDA development environment
+        run: uv sync --locked --extra dev --extra docs
+      - name: Require the supported CUDA environment
+        run: |
+          uv run python - <<'PY'
+          import platform
+          import sys
+
+          import torch
+
+          assert sys.platform == "linux", sys.platform
+          assert platform.machine() == "x86_64", platform.machine()
+          assert torch.version.cuda == "12.8", torch.version.cuda
+          assert torch.cuda.is_available(), "CUDA is not available"
+          assert torch.cuda.device_count() >= 2, torch.cuda.device_count()
+          assert torch.distributed.is_nccl_available(), "NCCL is not available"
+          PY
+      - name: Check formatting
+        run: uv run ruff format --check .
+      - name: Lint
+        run: uv run ruff check .
+      - name: Run unit and contract tests on the supported CUDA host
+        # These checks are not a substitute for distributed training
+        # qualification on the release cluster.
+        run: uv run pytest -q
+      - name: Build documentation without warnings
+        run: uv run sphinx-build -W --keep-going -b html docs/source docs/_build/html
+      - name: Build distributions
+        run: uv build
+      - name: Verify clean wheel installation and plugin loading
+        shell: bash
+        run: |
+          set -euo pipefail
+          verify_root="$(mktemp -d)"
+          uv venv --python 3.11 "$verify_root/.venv"
+          verify_python="$verify_root/.venv/bin/python"
+          uv pip install --python "$verify_python" setuptools wheel packaging ninja
+          uv pip install --python "$verify_python" \
+            --index-url https://download.pytorch.org/whl/cu128 \
+            torch==2.8.0 torchvision==0.23.0 torchaudio==2.8.0
+          uv pip install --python "$verify_python" \
+            --extra-index-url https://download.pytorch.org/whl/cu128 \
+            --no-build-isolation \
+            dist/*.whl \
+            examples/plugins/custom_recipe \
+            examples/plugins/custom_dataset \
+            examples/plugins/custom_model
+          uv pip check --python "$verify_python"
+          "$verify_root/.venv/bin/dfactory" --help >/dev/null
+          "$verify_root/.venv/bin/dfactory" config validate \
+            --config configs/recipes/sft/llada2_mini.yaml >/dev/null
+          "$verify_root/.venv/bin/dfactory" recipes list >/dev/null
+          (
+            cd /tmp
+            "$verify_python" - <<'PY'
+          import json
+          import tempfile
+          from pathlib import Path
+
+          from dfactory import get_dataset, get_model, get_recipe
+
+          recipe = get_recipe("example_causal_lm")
+          dataset = get_dataset("json_array")
+          model = get_model("hf_causal_lm")
+          assert recipe.config_type.from_mapping({}).loss_weight == 1.0
+          assert model.provider_type().__class__.__name__ == "HuggingFaceCausalLMProvider"
+          with tempfile.TemporaryDirectory() as directory:
+              path = Path(directory) / "records.json"
+              path.write_text(json.dumps([{"input_ids": [1, 2, 3]}]), encoding="utf-8")
+              assert dataset.factory(str(path)) == [{"input_ids": [1, 2, 3]}]
+          PY
+          )

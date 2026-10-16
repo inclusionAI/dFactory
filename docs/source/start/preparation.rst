@@ -25,8 +25,8 @@ We provide a helper script to download the weights from Hugging Face:
 
    # Choose a destination for the original model files
    python ./scripts/download_hf_model.py \
-     --repo_id inclusionAI/LLaDA2.0-mini-preview \
-     --local_dir /path/to/separate_expert_model
+     --repo-id inclusionAI/LLaDA2.0-mini-preview \
+     --local-dir /path/to/separate_expert_model
 
 Step 2: Convert to Merged Format
 --------------------------------

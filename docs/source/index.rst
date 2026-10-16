@@ -6,6 +6,12 @@
 dFactory documentation
 ========================
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Design
+
+   architecture
+
 .. _Contents:
 
 .. toctree::
@@ -16,6 +22,7 @@ dFactory documentation
    start/preparation
    start/quickstart
    start/configs
+   start/migration
 
 
 .. toctree::
@@ -23,7 +30,7 @@ dFactory documentation
    :caption: Train
 
    advanced/distributed
-   advanced/profiler
+   advanced/debugging
 
 .. toctree::
    :maxdepth: 2
@@ -37,13 +44,27 @@ dFactory documentation
 
    algo/random_mask
    algo/block_diffusion
-   algo/trainable_parallel_decoding
+   algo/ar_sft
+   algo/mtf
+   algo/emtf
+   algo/emtf_random_t2t
+   algo/ar2bd
+   algo/estf
 
 
 .. toctree::
    :maxdepth: 2
-   :caption: API Reference
+   :caption: Extend dFactory
 
+   extend/recipes
+   extend/api
+   extend/plugins
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contributing
+
+   contributing/releasing
 
 .. toctree::
    :maxdepth: 2

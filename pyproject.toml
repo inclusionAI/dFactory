@@ -1,0 +1,80 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dfactory"
+version = "0.2.0.dev0"
+description = "A modular training framework for discrete diffusion language models."
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+license = "Apache-2.0"
+license-files = ["LICENSE", "LEGAL.md"]
+dependencies = [
+  "datasets>=2.16,<=2.21",
+  "huggingface-hub",
+  "numpy",
+  "PyYAML>=6",
+  "safetensors",
+  "torch==2.8.0",
+  "torchaudio==2.8.0",
+  "torchvision==0.23.0",
+  "tqdm",
+  "transformers[torch]==4.57.3",
+  "veomni[gpu]==0.1.4",
+]
+
+[project.optional-dependencies]
+dev = [
+  "build",
+  "pytest>=6,<8",
+  "ruff>=0.7,<1",
+]
+docs = [
+  "myst-parser",
+  "sphinx",
+  "sphinx-rtd-theme",
+]
+
+[project.scripts]
+dfactory = "dfactory.cli:main"
+
+[project.entry-points."dfactory.recipes"]
+
+[project.entry-points."dfactory.datasets"]
+
+[project.entry-points."dfactory.models"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.uv]
+environments = ["sys_platform == 'linux' and platform_machine == 'x86_64'"]
+
+[tool.uv.sources]
+torch = [{ index = "pytorch" }]
+torchvision = [{ index = "pytorch" }]
+torchaudio = [{ index = "pytorch" }]
+
+[tool.uv.extra-build-dependencies]
+flash-attn = [{ requirement = "torch", match-runtime = true }]
+
+[[tool.uv.index]]
+name = "pytorch"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/dfactory/models/llada2/modeling.py" = ["E501"]

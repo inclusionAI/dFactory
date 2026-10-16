@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dfactory-example-model"
+version = "0.1.0"
+description = "An installable dFactory model-provider extension example."
+requires-python = ">=3.11"
+dependencies = ["dfactory>=0.1,<0.2"]
+
+[project.entry-points."dfactory.models"]
+hf_causal_lm = "dfactory_example_model:model_spec"
+
+[tool.setuptools.packages.find]
+where = ["src"]

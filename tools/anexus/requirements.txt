@@ -1,0 +1,15 @@
+# Runtime dependencies for the vendored Anexus tooling.
+# Documentation and development dependencies are intentionally omitted.
+aiohttp>=3.9
+akernel-sdk==0.1.5
+beautifulsoup4>=4.12
+httpx>=0.25
+opentelemetry-api>=1.25
+opentelemetry-sdk>=1.25
+oss2>=2.18
+pydantic>=2.7
+python-dotenv>=1.2,<2
+PyYAML>=6
+requests>=2.32
+rich>=13.7
+swebench>=4.1.0

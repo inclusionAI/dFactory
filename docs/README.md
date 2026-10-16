@@ -1,23 +1,17 @@
-# DLLM documentations
+# dFactory documentation
 
 ## Build the docs
 
 ```bash
-# If you want to view auto-generated API docstring, please make sure verl is available in python path. For instance, install verl via:
-# pip install .. -e[test]
-
-# Install dependencies needed for building docs.
-pip install -r requirements.txt
-
-# Build the docs.
-make clean
-make html
+# Run from the repository root on the supported Linux CUDA environment.
+uv sync --locked --extra docs
+uv run sphinx-build -W --keep-going -b html docs/source docs/_build/html
 ```
 
 ## Open the docs with your browser
 
 ```bash
-python -m http.server -d _build/html/
+python -m http.server -d docs/_build/html/
 ```
 
-Launch your browser and navigate to <http://localhost:8000> to view the documentation. Alternatively you could drag the file `_build/html/index.html` to your local browser and view directly.
+Navigate to <http://localhost:8000> to view the documentation.

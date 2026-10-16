@@ -1,0 +1,10 @@
+include LICENSE
+include LEGAL.md
+include README.md
+include uv.lock
+recursive-include configs *.json *.yaml
+recursive-include docs *.md *.rst *.txt *.py *.css *.png Makefile
+prune docs/_build
+recursive-include examples *.md *.py *.toml
+recursive-include scripts *.py *.sh
+recursive-include tests *.py

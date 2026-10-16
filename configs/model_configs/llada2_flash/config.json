@@ -3,11 +3,6 @@
         "LLaDA2MoeModelLM"
     ],
     "attention_dropout": 0.0,
-    "auto_map": {
-        "AutoConfig": "configuration_llada2_moe.LLaDA2MoeConfig",
-        "AutoModel": "modeling_llada2_moe.LLaDA2MoeModel",
-        "AutoModelForCausalLM": "modeling_llada2_moe.LLaDA2MoeModelLM"
-    },
     "num_hidden_layers": 32,
     "hidden_size": 4096,
     "intermediate_size": 9216,

@@ -1,16 +1,16 @@
 import os
 import re
 from argparse import ArgumentParser
+from collections.abc import Generator
 from dataclasses import dataclass
 from glob import glob
-from typing import Generator
 
 import torch
 from safetensors.torch import safe_open
 from tqdm import tqdm
 from transformers import AutoConfig
 
-from veomni.models import build_tokenizer, save_model_weights
+from dfactory.runtime.veomni.model_io import build_tokenizer, save_model_weights
 
 
 @dataclass
@@ -28,9 +28,10 @@ class StateDictIterator:
             for key in state_dict.keys():
                 yield key, state_dict[key]
 
+
 def moe_merge(state_dict: dict[str, torch.Tensor], config) -> dict[str, torch.Tensor]:
     new_state_dict: dict[str, torch.Tensor] = dict()
-    processed_keys: set[str] = set()        
+    processed_keys: set[str] = set()
 
     num_layers = config.num_hidden_layers
     num_experts = config.num_experts
@@ -42,7 +43,7 @@ def moe_merge(state_dict: dict[str, torch.Tensor], config) -> dict[str, torch.Te
     for layer_id in range(first_k_dense_replace, num_layers):
         for proj_type in proj_types:
             expert_weights = []
-            current_expert_keys = []                
+            current_expert_keys = []
 
             for expert_id in range(num_experts):
                 expert_key = f"model.layers.{layer_id}.mlp.experts.{expert_id}.{proj_type}.weight"
@@ -57,18 +58,16 @@ def moe_merge(state_dict: dict[str, torch.Tensor], config) -> dict[str, torch.Te
             processed_keys.update(current_expert_keys)
             for key in current_expert_keys:
                 del state_dict[key]
-            print(f"✓ Layer {layer_id}.{proj_type}: {expert_weights[0].shape} -> {merged_weight.shape}")                
+            print(f"✓ Layer {layer_id}.{proj_type}: {expert_weights[0].shape} -> {merged_weight.shape}")
             del expert_weights
-
 
     for key, tensor in state_dict.items():
         if key not in processed_keys:
             new_state_dict[key] = tensor
     return new_state_dict
 
-def split_moe_experts(
-    merged_state_dict: dict[str, torch.Tensor], config
-) -> dict[str, torch.Tensor]:
+
+def split_moe_experts(merged_state_dict: dict[str, torch.Tensor], config) -> dict[str, torch.Tensor]:
     split_state_dict: dict[str, torch.Tensor] = dict()
 
     num_experts = getattr(config, "num_experts", None)
@@ -80,9 +79,7 @@ def split_moe_experts(
 
     proj_types = ["gate_proj", "up_proj", "down_proj"]
 
-    merged_key_pattern = re.compile(
-        r"model\.layers\.(\d+)\.mlp\.experts\.(" + "|".join(proj_types) + r")$"
-    )
+    merged_key_pattern = re.compile(r"model\.layers\.(\d+)\.mlp\.experts\.(" + "|".join(proj_types) + r")$")
 
     for key, merged_tensor in merged_state_dict.items():
         match = merged_key_pattern.match(key)
@@ -109,7 +106,9 @@ def split_moe_experts(
     return split_state_dict
 
 
-def main(input_path, output_path):
+def main(input_path: str, output_path: str, mode: str) -> None:
+    if mode not in {"merge", "split"}:
+        raise ValueError("mode must be merge or split")
     torch.set_default_dtype(torch.bfloat16)
     os.makedirs(output_path, exist_ok=True)
 
@@ -125,13 +124,11 @@ def main(input_path, output_path):
         for name, tensor in state_dict_iterator:
             state_dict[name] = tensor.cpu()
 
-    if args.mode == "merge":
+    if mode == "merge":
         new_state_dict = moe_merge(state_dict, config)
-    elif args.mode == "split":
-        new_state_dict = split_moe_experts(state_dict, config)
     else:
-        raise ValueError("unsupport mode")
-    
+        new_state_dict = split_moe_experts(state_dict, config)
+
     state_dict.clear()
     model_assets = [config, tokenizer]
     save_model_weights(output_path, new_state_dict, model_assets=model_assets)
@@ -143,4 +140,4 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--output-path", type=str, required=True)
     parser.add_argument("-m", "--mode", type=str, default="merge", choices=["merge", "split"])
     args = parser.parse_args()
-    main(args.input_path, args.output_path)
+    main(args.input_path, args.output_path, args.mode)

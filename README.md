@@ -2,241 +2,224 @@
   <img src="https://mdn.alipayobjects.com/huamei_qa8qxu/afts/img/A*9yAZT61NXRkAAAAARBAAAAgAemJ7AQ/original" width="40%" alt="dFactory" />
 </div>
 
-<h4 align="center">
+# dFactory
 
-[![License: MIT](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](./LICENSE)
-[![HuggingFace: Models](https://img.shields.io/badge/HuggingFace-Models-yellow)](https://huggingface.co/inclusionAI/LLaDA2.0-mini-preview)
-[![Static Badge](https://img.shields.io/badge/Tutorial-Get_Start-red)](https://inclusionai.github.io/dFactory/)
-[![Static Badge](https://img.shields.io/badge/DeepWiki-Explore-green)](https://deepwiki.com/inclusionAI/dFactory)
-<!-- [![arXiv][arxiv-image]][arxiv-url] -->
+> **Development preview:** the standalone 0.2 development line currently lives
+> on the `develop` branch while the public repository migration is completed.
 
-</h4>
+dFactory is an extensible training framework for discrete diffusion language
+models. It provides SFT, autoregressive SFT, multi-stage fine-tuning, and
+continued-pretraining recipes for the LLaDA2 family, with PyTorch FSDP2 and
+VeOmni providing the distributed runtime.
 
+dFactory owns its model, data, recipe, checkpoint, and configuration semantics.
+VeOmni is an installed dependency, not a source submodule and not part of the
+public extension API.
 
-# dFactory: Easy and Efficient dLLM Fine-Tuning
+## Installation
 
-## Features
-
-- **Various models:** LLaDA2.0-mini (16B), LLaDA2.0-flash (100B)
-- **Integrated methods:** (Continous) supervised-finetuning (block-diffusion, full attention), etc.
-
-
-## Supported Models
-
-| Model ID | Description | Size | Config Path | Hugging Face Link |
-| --- | --- | --- | --- | --- |
-| `inclusionAI/LLaDA2.0-mini` | Instruction-tuned model, ready for downstream applications. | 16B | `configs/model_configs/llada2_mini/` | [🤗 Model Card](https://huggingface.co/inclusionAI/LLaDA2.0-mini) |
-| `inclusionAI/LLaDA2.0-flash` | Instruction-tuned model, ready for downstream applications. | 100B | `configs/model_configs/llada2_flash/` | [🤗 Model Card](https://huggingface.co/inclusionAI/LLaDA2.0-flash) |
-| `inclusionAI/LLaDA2.1-mini` | Coming Soon. | 16B | `configs/model_configs/llada2_mini/` | [🤗 Model Card](https://huggingface.co/inclusionAI/LLaDA2.1-mini) |
-| `inclusionAI/LLaDA2.1-flash` | Coming Soon. | 16B | `configs/model_configs/llada2_flash/` | [🤗 Model Card](https://huggingface.co/inclusionAI/LLaDA2.1-flash) |
-| `inclusionAI/LLaDA2.2-flash` | Coming Soon. | 16B | `configs/model_configs/llada2_flash/` | [🤗 Model Card](https://huggingface.co/inclusionAI/LLaDA2.2-flash) |
-
-## TODO
-
-We are actively working on enhancing the project with new features and improvements. Our roadmap for the near future includes:
-
-- [☑️] **Comprehensive Documentation**: A full documentation site is underway, which will feature in-depth tutorials, API references, and best practices.
-- [☑️] **Trainable Parallel Decoding**: Integration of support for trainable parallel decoding to enable more advanced use cases.
-
-Stay tuned for these updates!
-
-## Getting Started
-
-### 0. Environment Setup
-
-#### Option A: Use uv (Recommended)
+dFactory supports x86-64 Linux servers with NVIDIA GPUs and CUDA 12.8. It does
+not support macOS, MPS, or CPU training. Python 3.11, 3.12, or 3.13 is required.
+CUDA dependencies, including VeOmni's GPU runtime, are part of the default
+installation rather than an optional execution mode.
 
 ```bash
-# Install uv if not already installed
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-git clone https://github.com/inclusionAI/dFactory.git --recursive
-cd dFactory/VeOmni
-
-# Install dependencies
-uv sync --extra gpu
-
-# Activate environment
-source .venv/bin/activate
-
-# Back to our workdir
-cd ..
-```
-
-#### Option B: Use pip
-
-```bash
-git clone https://github.com/inclusionAI/dFactory.git --recursive
+git clone --branch develop https://github.com/inclusionAI/dFactory.git
 cd dFactory
-pip install -e VeOmni/
+
+# CUDA training and development environment
+uv sync --locked --extra dev
+source .venv/bin/activate
 ```
 
-### 1. Download and Merge Model Weights
-
-Our training scripts require model weights in a "merged-expert" format for optimal performance. Before starting, you must download the standard weights and convert them.
-
-**1. Download the original model:** We provide a helper script to download the weights from the Hugging Face Hub.
+With pip:
 
 ```bash
-# Choose a destination for the original model files
-python ./scripts/download_hf_model.py \
-  --repo_id inclusionAI/LLaDA2.0-mini-preview \
-  --local_dir /path/to/separate_expert_model
+python -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip setuptools wheel packaging ninja
+pip install --index-url https://download.pytorch.org/whl/cu128 \
+  torch==2.8.0 torchvision==0.23.0 torchaudio==2.8.0
+pip install --extra-index-url https://download.pytorch.org/whl/cu128 \
+  --no-build-isolation -e .
 ```
 
-**2. Convert to the merged format:** Run the following script to create the merged checkpoint required for training.
+The two-stage pip flow is required because `flash-attn` imports Torch while
+building its CUDA extension. `uv sync` handles that build dependency through
+the repository configuration.
+
+The distribution, import package, and command are all named `dfactory`.
+
+## Prepare a run
+
+The current SFT path accepts conversation JSONL. Every line is one object:
+
+```json
+{"messages":[{"role":"user","content":"What is 2 + 2?"},{"role":"assistant","content":"4"}]}
+```
+
+Download LLaDA2 weights and convert the experts to the merged representation
+used by the VeOmni kernels:
 
 ```bash
-# Use the path from the previous step as the source
+python scripts/download_hf_model.py \
+  --repo-id inclusionAI/LLaDA2.0-mini-preview \
+  --local-dir /path/to/original-model
+
 python scripts/moe_convertor.py \
-  --input-path /path/to/separate_expert_model \
-  --output-path /path/to/save/merged_model \
+  --input-path /path/to/original-model \
+  --output-path /path/to/merged-model \
   --mode merge
 ```
 
-The directory `/path/to/save/merged_model` is what you will use for the training script. For more details, see [MoE Expert Merging and Splitting Utilities](#moe-expert-merging-and-splitting-utilities)
+Copy `configs/recipes/sft/llada2_mini.yaml` and set:
 
-### 2. Prepare Training Data
+- `model.weights_path` to the merged model;
+- `model.tokenizer_path` to the original model/tokenizer;
+- `data.path` to the training JSONL;
+- `distributed.dp` to the number of data-parallel processes.
 
-Before training, the dataset must be prepared. This tutorial uses the `openai/gsm8k` dataset and demonstrates how to convert it into the conversational format.
+For LLaDA2 Flash, start from
+`configs/recipes/sft/llada2_flash.yaml` and use a validated topology with
+enough aggregate GPU memory for model, gradients, and optimizer state.
 
-We provide an example script, `./scripts/build_gsm8k_dataset.py`, for this purpose. You can adapt this script or write your own to process other datasets.
-
-Running the following command executes the script. It converts the "question" and "answer" fields into a conversational messages field. The processed dataset is then saved to the ./gsm8k_datasets/ directory, split into two separate files: `train.jsonl` for training and `test.jsonl` for evaluation.
-
-```bash
-python ./scripts/build_gsm8k_dataset.py
-```
-
-### 3. Modify Training Configs
-
-Edit `configs/sft/llada2_mini_bd_sft.yaml`:
-```yaml
-model:
-  model_path: "/your/model/path"
-data:
-  train_path: "/your/data/path"
-train:
-  output_dir: "/your/output/path"
-```
-
-### 4. Run Training
-
-With all preparations complete, you can now start the fine-tuning process with a single command:
+Validate the complete configuration before launching:
 
 ```bash
-PYTHONPATH=$(pwd)/VeOmni:$PYTHONPATH sh train.sh tasks/train_llada2_bd.py configs/sft/llada2_mini_bd_sft.yaml
+dfactory config validate --config configs/recipes/sft/llada2_mini.yaml
 ```
 
-### 5. Interacting with the Fine-Tuned Model
+## Train
 
-To interact with your fine-tuned model, you must complete two main steps: converting the checkpoint and copying the modeling file.
-
-**Step 1: Convert the Checkpoint**
-
-First, you need to convert the checkpoint from the merged format used during training back to the standard Mixture-of-Experts (MoE) structure.
-
-> **Important: Finding the Correct Input Path**
->
-> The --input-path for the conversion script is the path to the saved Hugging Face checkpoint, not the root output directory you specified during training. The checkpoint is typically located in a subdirectory like:
->
-> TRAIN_OUTPUT_DIR/checkpoints/global_step_XXX/hf_ckpt/
-
-Run the following command to perform the conversion:
+For normal single-node multi-GPU development, use the repository launcher. It
+uses every visible GPU by default, validates the resolved config once, and then
+starts `torchrun --standalone`:
 
 ```bash
-python scripts/moe_convertor.py \
-  --input-path /path/to/merged_model \
-  --output-path /path/to/save/separate_expert_model \
-  --mode split
+bash scripts/train_single_node.sh \
+  configs/recipes/sft/llada2_mini.yaml \
+  --set model.weights_path=/models/llada2-mini-merged \
+  --set model.tokenizer_path=/models/llada2-mini-original \
+  --set data.path=/datasets/train.jsonl \
+  --set run.output_dir=/outputs/sft-run \
+  --set optimization.global_batch_size=8
 ```
 
-**Step 2: Copy the Modeling File**
+Set `CUDA_VISIBLE_DEVICES` to select GPUs or `NPROC_PER_NODE` to override the
+auto-detected process count. `NPROC_PER_NODE` must be at least two, and the
+launcher always sets `distributed.dp` to the resulting local world size. Pass
+any other config change as an additional `--set PATH=VALUE` argument.
 
-After the conversion, a final manual step is required. You must copy the model's architecture file (e.g., `modeling_llada2_moe.py`) into the newly created separate_expert_model directory.
+The same launcher directly supports every checked-in training profile:
 
-This file must come from the directory of your original base model — the one you started with before any merge or training operations. The training and conversion processes only update the model weights, not the architecture file, which is why the original version is needed.
+| Training target | Config |
+|---|---|
+| LLaDA2 Mini SFT | `configs/recipes/sft/llada2_mini.yaml` |
+| LLaDA2 Mini SFT + SWA | `configs/recipes/sft/llada2_mini_swa.yaml` |
+| LLaDA2 Flash SFT | `configs/recipes/sft/llada2_flash.yaml` |
+| AR SFT | `configs/recipes/ar_sft/llada2_mini.yaml` |
+| MTF | `configs/recipes/mtf/llada2_mini.yaml` |
+| EMTF | `configs/recipes/emtf/llada2_mini.yaml` |
+| EMTF random-T2T | `configs/recipes/emtf_random_t2t/llada2_mini.yaml` |
+| AR2BD continued pretraining | `configs/recipes/ar2bd/llada2_mini.yaml` |
+| ESTF continued pretraining | `configs/recipes/estf/llada2_mini.yaml` |
+
+To resume, use the same command with
+`--set checkpoint.resume_from=/path/to/checkpoints/global_step_N`.
+
+For multiple nodes, launch at least two processes per node and run the same
+command on every node with its own `NODE_RANK`:
 
 ```bash
-# Example: Copying from the initial, pre-merge model directory
-cp /path/to/original_base_model/modeling_llada2_moe.py /path/to/save/separate_expert_model/
+WORLD_SIZE=$((NNODES * NPROC_PER_NODE))
+torchrun --nnodes="$NNODES" --node-rank="$NODE_RANK" \
+  --nproc-per-node="$NPROC_PER_NODE" \
+  --master-addr="$MASTER_ADDR" --master-port="$MASTER_PORT" \
+  -m dfactory train \
+  --config configs/recipes/sft/llada2_mini.yaml \
+  --set distributed.dp="$WORLD_SIZE" \
+  --set optimization.global_batch_size="$WORLD_SIZE"
 ```
 
-With the model converted and the modeling file in place, you are now ready to chat! Follow the instructions on the [official model card](https://huggingface.co/inclusionAI/LLaDA2.0-mini-preview#%F0%9F%A4%97-hugging-face-transformers) to start a conversation with your model.
+Resolved configuration is written to `run.output_dir/resolved.yaml`.
+Distributed checkpoints are written below `run.output_dir/checkpoints`; every
+`global_step_N` directory also contains its resolved configuration and
+model/tokenizer assets. Set `checkpoint.resume_from` to that directory to
+resume its model, optimizer, scheduler, RNG, and dataloader progress.
 
-## MoE Expert Merging and Splitting Utilities
+## Architecture
 
-We provide a utility script, `./scripts/moe_convertor.py`, to convert MoE model weights between two formats:
+```text
+src/dfactory/
+  api.py                         stable Python API
+  cli.py                         dfactory command
+  config/                        strict, dFactory-owned configuration
+  recipes/                       self-contained recipe config, data, trainer
+  trainers/                      shared trainer lifecycle and context
+  components/block_diffusion/    shared Block Diffusion primitives
+  data/                          sources, transforms, packing, collators
+  models/                        dFactory-owned model providers
+  runtime/veomni/                sole VeOmni integration boundary
+```
 
-1. Separate-Expert Format: The default format used by frameworks like Hugging Face transformers, where each expert's weights are stored as individual tensors.
-2. Merged-Expert Format: A consolidated format where weights for all experts in a layer are stacked into a single, higher-dimensional tensor.
+`dfactory.trainers.BaseTrainer` owns the complete training lifecycle: runtime,
+model and data construction, gradient accumulation, optimization, checkpoint
+resume/save, metrics, and model export. Concrete trainers such as
+`recipes/sft/trainer.py` and `recipes/emtf/trainer.py` implement only their
+algorithm-specific `training_step`. Each recipe directory owns its
+configuration, validation, data preparation, trainer, and the `RecipeSpec`
+that ties them together.
 
-### Merging Experts
+The Block Diffusion package is also intentionally narrow. It contains reusable
+layout, attention, noise, and objective primitives; complete diffusion training
+logic belongs to a recipe.
 
-Convert a model with separate expert weights into the consolidated "merged" format. By merging expert weights, we can leverage highly efficient batched matrix multiplication on GPUs, significantly speeding up computation.
+## Extend dFactory
 
-**How it Works:**
+Recipes, dataset sources, and model providers are discovered through Python
+entry points:
 
-The script iterates through each MoE layer and stacks the weights of all experts (e.g., gate_proj, up_proj, down_proj) into a single tensor.
+```toml
+[project.entry-points."dfactory.recipes"]
+my_recipe = "my_package.recipe:recipe_spec"
 
-- Before Merging (Separate Experts):
+[project.entry-points."dfactory.datasets"]
+my_source = "my_package.data:dataset_spec"
 
-  ```
-  model.layers.15.mlp.experts.0.gate_proj.weight  (shape: [4096, 14336])
-  model.layers.15.mlp.experts.1.gate_proj.weight  (shape: [4096, 14336])
-  ... (and so on for all 8 experts)
-  ```
+[project.entry-points."dfactory.models"]
+my_model = "my_package.model:model_spec"
+```
 
-- After Merging (Merged Experts):
+An extension owns its implementation and declares a compatible dFactory
+version. Its `RecipeSpec` owns run validation and dataset construction, and
+selects a `BaseTrainer` subclass. The shared lifecycle never assumes SFT
+parameters such as `block_size`. An extension does not need to modify the
+central CLI or registry.
 
-  ```
-  model.layers.15.mlp.experts.gate_proj.weight  (shape: [8, 4096, 14336])
-  ```
+Runnable packaging examples for all three extension points live under
+[`examples/plugins`](examples/plugins). After installation they appear in
+`dfactory recipes list`, `dfactory datasets list`, and `dfactory models list`.
 
-**Usage:**
+## Development and validation
+
+Run development checks on the same x86-64 Linux CUDA 12.8 server class used by
+the project. A macOS, MPS, CPU-only, single-process, or single-GPU environment
+is not a supported development or qualification target.
 
 ```bash
-python scripts/moe_convertor.py \
-  --input-path /path/to/separate_expert_model \
-  --output-path /path/to/save/merged_model \
-  --mode merge
+uv run ruff format src tests
+uv run ruff check src tests
+uv run pytest tests/components/block_diffusion/test_attention.py -v
+uv run pytest tests/recipes/sft/test_trainer.py -v
+uv build
 ```
 
-### Splitting Experts
+Unit checks do not qualify a release. Training validation requires both Linux
+CUDA multi-GPU and multi-node release gates documented in the release guide.
 
-This process performs the reverse operation: it takes a model in the "merged" format and splits the expert weights back into separate tensors for each expert. This conversion is useful for:
-
-- Fine-tuning: Converting a merged model back to the standard format for fine-tuning with frameworks like Hugging Face transformers.
-- Analysis: Inspecting or modifying the weights of individual experts.
-- Compatibility: Ensuring the model can be loaded by tools that expect separate expert weights.
-
-**How it Works:**
-
-The script identifies the merged weight tensors and slices them along the expert dimension to create individual weight files for each expert.
-
-- Before Splitting (Merged Experts):
-
-  ```
-  model.layers.15.mlp.experts.gate_proj.weight  (shape: [8, 4096, 14336])
-  ```
-
-- After Splitting (Separate Experts):
-
-  ```
-  model.layers.15.mlp.experts.0.gate_proj.weight  (shape: [4096, 14336])
-  model.layers.15.mlp.experts.1.gate_proj.weight  (shape: [4096, 14336])
-  ... (and so on for all 8 experts)
-  ```
-
-**Usage:**
-
-```bash
-python scripts/moe_convertor.py \
-  --input-path /path/to/merged_model \
-  --output-path /path/to/save/separate_expert_model \
-  --mode split
-```
+See the [documentation](docs/source/index.rst) for configuration and extension
+details, including the migration guide and installable plugin examples.
 
 ## License
 
-This project is licensed under the Apache 2.0 license - see the LICENSE file for details.
+Apache License 2.0. See [LICENSE](LICENSE).

@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dfactory-example-dataset"
+version = "0.1.0"
+description = "An installable dFactory dataset-source extension example."
+requires-python = ">=3.11"
+dependencies = ["dfactory>=0.1,<0.2"]
+
+[project.entry-points."dfactory.datasets"]
+json_array = "dfactory_example_dataset:dataset_spec"
+
+[tool.setuptools.packages.find]
+where = ["src"]

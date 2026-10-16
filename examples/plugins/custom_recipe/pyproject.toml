@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dfactory-example-recipe"
+version = "0.1.0"
+description = "An installable dFactory recipe extension example."
+requires-python = ">=3.11"
+dependencies = ["dfactory>=0.1,<0.2"]
+
+[project.entry-points."dfactory.recipes"]
+example_causal_lm = "dfactory_example_recipe:recipe_spec"
+
+[tool.setuptools.packages.find]
+where = ["src"]

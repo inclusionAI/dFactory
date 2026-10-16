@@ -6,9 +6,9 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'dFactory'
-copyright = '2025, DILAB'
-author = 'DILAB'
+project = "dfactory"
+copyright = "2026, DILAB"
+author = "DILAB"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -24,6 +24,7 @@ extensions = [
 # Use Google style docstrings instead of NumPy docstrings.
 napoleon_google_docstring = True
 napoleon_numpy_docstring = False
+autosectionlabel_prefix_document = True
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
@@ -32,13 +33,8 @@ source_suffix = {
     ".md": "markdown",
 }
 
-templates_path = ['_templates']
-exclude_patterns = []
-
-# List of patterns, relative to source directory, that match files and
-# directories to ignore when looking for source files.
-# This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+templates_path = ["_templates"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "README.md"]
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
@@ -49,19 +45,11 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # a list of builtin themes.
 #
 html_theme = "sphinx_rtd_theme"
-html_static_path = ['../_static']
-
-# Add the JavaScript file
-html_js_files = [
-    "js/runllm-widget.js",
-    "js/resizable-sidebar.js",
-]
+html_static_path = ["../_static"]
 
 # Add custom CSS file for full-width layout
 html_css_files = [
     "custom.css",
 ]
-
-exclude_patterns += ["README.md"]
 
 suppress_warnings = ["ref.duplicate", "ref.myst"]

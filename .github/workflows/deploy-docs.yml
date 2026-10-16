@@ -1,4 +1,4 @@
-name: Deploy Documents
+name: Deploy Documentation
 
 on:
   push:
@@ -9,25 +9,43 @@ on:
 
 jobs:
   run:
-    name: "deploy docs"
-    runs-on: ubuntu-latest
+    name: Deploy documentation from the supported CUDA environment
+    runs-on: [self-hosted, linux, x64, cuda, multi-gpu]
     permissions:
       contents: write
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
-          # See <https://github.com/mkdocs/mkdocs/issues/2370#issuecomment-821926264>
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Build HTML
-        uses: ammaraskar/sphinx-action@8.2.3
-        with:
-          docs-folder: "docs/"
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Install the locked documentation environment
+        run: uv sync --locked --extra docs
+
+      - name: Require the supported CUDA environment
+        run: |
+          uv run python - <<'PY'
+          import platform
+          import sys
+
+          import torch
+
+          assert sys.platform == "linux", sys.platform
+          assert platform.machine() == "x86_64", platform.machine()
+          assert torch.version.cuda == "12.8", torch.version.cuda
+          assert torch.cuda.is_available(), "CUDA is not available"
+          assert torch.cuda.device_count() >= 2, torch.cuda.device_count()
+          assert torch.distributed.is_nccl_available(), "NCCL is not available"
+          PY
+
+      - name: Build HTML without warnings
+        run: uv run sphinx-build -W --keep-going -b html docs/source docs/_build/html
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v4
         with:
           name: html-docs
           path: docs/_build/html/

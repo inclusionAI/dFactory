@@ -1,0 +1,66 @@
+run:
+  output_dir: outputs/llada2-mini-emtf-random-t2t
+  seed: 42
+  max_steps: 1000
+  num_train_epochs: 1
+
+recipe:
+  name: emtf_random_t2t
+  params:
+    block_size: 32
+    max_stages: 4
+    confidence_threshold: 0.5
+    force_mask_token_ids: []
+
+model:
+  provider: llada2
+  config_path: configs/model_configs/llada2_mini
+  weights_path: /path/to/merged/model
+  tokenizer_path: /path/to/original/model
+  attention: flex_attention
+  moe: fused
+  init_device: meta
+  mask_token_id: 156895
+  eos_token_id: 156892
+  pad_token_id: 126081
+
+data:
+  source: jsonl
+  path: /path/to/train.jsonl
+  format: conversation
+  text_key: messages
+  max_seq_len: 2048
+  packing: true
+  num_workers: 8
+
+distributed:
+  mode: fsdp2
+  dp: 8
+  dp_replicate: 1
+  ep: 1
+  activation_offload: false
+  gradient_checkpointing: true
+
+optimization:
+  optimizer: adamw
+  lr: 1.0e-5
+  beta1: 0.9
+  beta2: 0.999
+  weight_decay: 0.1
+  scheduler: cosine
+  warmup_ratio: 0.03
+  decay_ratio: 1.0
+  min_lr: 1.0e-7
+  global_batch_size: 8
+  micro_batch_size: 1
+  max_grad_norm: 1.0
+
+checkpoint:
+  resume_from: null
+  save_every_steps: 1000
+  save_every_epochs: 1
+  save_hf_weights: true
+
+logging:
+  report_to: [stdout]
+  log_every_steps: 10

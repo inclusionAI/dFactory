@@ -1,223 +1,86 @@
-Configuration Design Guide
-**************************
+====================
+Configuration
+====================
 
-YAML Configuration Structure
-============================
-
-Configuration files use hierarchical YAML structure with three main sections:
-
-.. code-block:: yaml
-
-   model:
-     # Model-specific settings
-   data:
-     # Data loading and preprocessing
-   train:
-     # Training hyperparameters and setup
-
-Model Configuration
-===================
-
-Model Section
--------------
-
-**Required fields:**
+dFactory uses a strict YAML schema. Unknown sections and fields are errors;
+command-line overrides use ``--set path=value``.
 
 .. code-block:: yaml
 
-   model:
-     config_path: "./configs/model_configs/[model_name]"
-     model_path: "./path/to/model"
-     tokenizer_path: "./path/to/tokenizer"
-     attn_implementation: "sdpa"        # sdpa|eager|flex_attention
-     moe_implementation: "fused"        # fused|standard
-
-.. warning::
-
-   **Flash Attention Limitation**: The flash attention backend can only be used with ``full_attention`` or ``causal_attention`` modes. It **cannot** adapt to custom attention types used in LLaDA2.0 models. **Do not use FlashAttention (flash_attn2/flash_attn) for Block Diffusion Mode models**. See :doc:`/algo/block_diffusion` for detailed explanation of block diffusion training.
-
-Data Configuration
-==================
-
-Data Section
-------------
-
-**Template for conversation data:**
-
-.. code-block:: yaml
-
-   data:
-     train_path: "./datasets/train.jsonl"
-     data_type: "conversation"          # conversation|plain|instruction
-     datasets_type: "mapping"           # mapping|streaming
-     dataloader_type: "native"          # native|custom
-     max_seq_len: 2048
-     text_keys: "messages"              # field name in JSON
-     noise_range_low: 0.3               # diffusion noise lower bound
-     noise_range_high: 0.8              # diffusion noise upper bound
-     num_workers: 16
-
-- Support multiple data formats (JSONL, Parquet)
-- Configurable noise ranges for diffusion training
-- Flexible text field mapping
-- Worker count based on CPU cores
-
-Training Configuration
-======================
-
-Training Section
-----------------
-
-**Distributed training setup:**
-
-.. code-block:: yaml
-
-   train:
-     output_dir: "./outputs/experiment_name"
-     
-     # Parallel configuration
-     data_parallel_mode: "fsdp2"        # fsdp2
-     tensor_parallel_size: 1            # model parallel
-     ulysses_parallel_size: 1           # sequence parallel
-     expert_parallel_size: 1            # MoE parallel
-     
-     # Batch configuration
-     global_batch_size: 16              # total batch across all GPUs
-     micro_batch_size: 1                # batch per GPU
-     
-     # Training schedule
+   run:
+     output_dir: outputs/sft
+     seed: 42
+     max_steps: 1000
      num_train_epochs: 1
-     save_epochs: 1                     # checkpoint frequency
-     log_steps: 1                       # logging frequency
 
-**Optimization parameters:**
+   recipe:
+     name: sft
+     params:
+       block_size: 32
+       noise_range: [0.3, 0.8]
+       same_token_labels: true
+       # Optional LLaDA2 sliding-window capability:
+       # sliding_window:
+       #   window_blocks: 16
+       #   sink_tokens: 4
 
-.. code-block:: yaml
+   model:
+     provider: llada2
+     config_path: configs/model_configs/llada2_mini
+     weights_path: /path/to/merged-model
+     tokenizer_path: /path/to/original-model
+     attention: flex_attention
+     moe: fused
+     init_device: meta
+     mask_token_id: 156895
+     eos_token_id: 156892
+     pad_token_id: 126081
 
-   train:
-     optimizer: "adamw"
-     beta1: 0.9
-     beta2: 0.999
-     lr: 1.0e-5                        # learning rate
-     lr_warmup_ratio: 0.03             # warmup steps ratio
-     lr_decay_style: "cosine"          # cosine|linear|constant
-     weight_decay: 0.1
+   data:
+     source: jsonl
+     path: /path/to/train.jsonl
+     format: conversation
+     text_key: messages
+     max_seq_len: 2048
+     packing: true
+     num_workers: 8
+
+   distributed:
+     mode: fsdp2
+     dp: 8
+     dp_replicate: 1
+     ep: 1
+     gradient_checkpointing: true
+
+   optimization:
+     optimizer: adamw
+     lr: 1.0e-5
+     scheduler: cosine
+     global_batch_size: 8
+     micro_batch_size: 1
      max_grad_norm: 1.0
 
-**Memory optimization:**
+   checkpoint:
+     resume_from: null
+     save_every_steps: 1000
+     save_every_epochs: 1
+     save_hf_weights: true
 
-.. code-block:: yaml
+   logging:
+     report_to: [stdout]
+     log_every_steps: 10
 
-   train:
-     enable_mixed_precision: true
-     enable_gradient_checkpointing: true
-     enable_full_shard: true           # FSDP parameter sharding
-     enable_fsdp_offload: true         # CPU offloading
-     empty_cache_steps: 500            # GPU memory cleanup
+``global_batch_size`` must be divisible by
+``micro_batch_size * distributed.dp``. ``max_seq_len`` must be divisible by the
+recipe block size. At training startup, the ``torchrun`` ``WORLD_SIZE`` must
+equal ``distributed.dp``; expert parallelism partitions that world rather than
+multiplying it. FSDP2 model construction requires ``model.init_device: meta``;
+CPU initialization and FSDP CPU offload are not supported. Token IDs are
+resolved in the order explicit run config, tokenizer, then model config.
 
-Configuration Patterns
-======================
+``model.moe: fused`` consumes the merged expert representation produced by
+``scripts/moe_convertor.py --mode merge`` and supports expert parallelism.
+``model.moe: eager`` consumes split Hugging Face expert weights and is limited
+to ``distributed.ep: 1``.
 
-Model Scaling
--------------
-
-**Small model template:**
-
-.. code-block:: yaml
-
-   train:
-     global_batch_size: 8               # Reduce for smaller models
-     micro_batch_size: 1
-
-**Large model template:**
-
-.. code-block:: yaml
-
-   train:
-     global_batch_size: 64              # Increase for larger models
-     micro_batch_size: 1
-     tensor_parallel_size: 2            # Enable model parallelism
-     expert_parallel_size: 2            # Distribute experts
-
-Dataset Adaptation
-------------------
-
-**For large datasets:**
-
-.. code-block:: yaml
-
-   data:
-     datasets_type: "streaming"        # Memory-efficient loading
-     num_workers: 32                   # Increase workers
-
-**For small datasets:**
-
-.. code-block:: yaml
-
-   data:
-     datasets_type: "mapping"          # Full dataset in memory
-     num_workers: 8                    # Reduce overhead
-
-Hardware Adaptation
-===================
-
-Single GPU Setup
-----------------
-
-.. code-block:: yaml
-
-   train:
-     data_parallel_mode: "fsdp2"
-     tensor_parallel_size: 1
-     expert_parallel_size: 1
-     global_batch_size: 4            # Fit single GPU
-     micro_batch_size: 1
-     enable_fsdp_offload: false      # Disable offloading
-
-Multi-GPU Setup
----------------
-
-.. code-block:: yaml
-
-   train:
-     data_parallel_mode: "fsdp2"
-     tensor_parallel_size: 1
-     expert_parallel_size: 2         # Distribute experts
-     global_batch_size: 32           # Scale with GPU count
-     micro_batch_size: 1
-     enable_fsdp_offload: false      # Faster training
-
-Memory-Constrained Setup
-------------------------
-
-.. code-block:: yaml
-
-   train:
-     enable_gradient_checkpointing: true
-     enable_full_shard: true
-     enable_fsdp_offload: true       # Enable CPU offloading
-     enable_activation_offload: true # Reduce GPU memory
-     micro_batch_size: 1             # Minimal per-GPU batch
-
-Best Practices
-==============
-
-**Path Management**
-   Use relative paths for configs
-      Store absolute paths in environment variables
-      Create separate output directories per experiment
-
-**Parameter Tuning**
-   Start with conservative batch sizes
-      Increase learning rate for larger batches
-      Adjust warmup ratio based on dataset size
-
-**Monitoring**
-   Enable W&B for experiment tracking
-      Set appropriate logging frequency
-      Monitor gradient norms and loss curves
-
-**Reproducibility**
-   Fix random seeds in training scripts
-      Document configuration changes
-      Version control configuration files
+Use ``dfactory config validate --config PATH`` to print the resolved YAML.
