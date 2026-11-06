@@ -40,7 +40,7 @@ def test_project_name_is_dfactory() -> None:
 
 def test_builtin_recipe_packages_own_their_trainers() -> None:
     source_root = Path(__file__).parents[1] / "src" / "dfactory"
-    recipe_names = {"ar2bd", "ar_sft", "emtf", "emtf_random_t2t", "estf", "mtf", "sft"}
+    recipe_names = {"ar2bd", "ar_sft", "emtf", "emtf_random_t2t", "estf", "mtf", "soldiff", "sft"}
 
     assert {path.parent.name for path in (source_root / "recipes").glob("*/trainer.py")} == recipe_names
     assert {path.name for path in (source_root / "trainers").glob("*.py")} == {

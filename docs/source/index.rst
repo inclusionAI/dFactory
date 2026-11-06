@@ -50,6 +50,7 @@ dFactory documentation
    algo/emtf_random_t2t
    algo/ar2bd
    algo/estf
+   algo/soldiff
 
 
 .. toctree::

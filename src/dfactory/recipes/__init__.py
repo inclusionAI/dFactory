@@ -36,6 +36,7 @@ def _register_builtins() -> None:
         "estf": ("dfactory.recipes.estf", "recipe_spec"),
         "mtf": ("dfactory.recipes.mtf", "recipe_spec"),
         "sft": ("dfactory.recipes.sft", "recipe_spec"),
+        "soldiff": ("dfactory.recipes.soldiff", "recipe_spec"),
     }
     for name, (module, attribute) in builtins.items():
         if not _RECIPES.contains_builtin(name):

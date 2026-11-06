@@ -10,9 +10,9 @@ _MODELS: Registry[ModelSpec] = Registry("dfactory.models")
 
 
 def _register_builtins() -> None:
-    if _MODELS.contains_builtin("llada2"):
-        return
-    _MODELS.register_lazy("llada2", "dfactory.models.llada2", "model_spec")
+    for name, module in (("llada2", "dfactory.models.llada2"), ("qwen3", "dfactory.models.qwen3")):
+        if not _MODELS.contains_builtin(name):
+            _MODELS.register_lazy(name, module, "model_spec")
 
 
 def get_model(name: str) -> ModelSpec:

@@ -117,4 +117,24 @@ def synchronize() -> None:
     torch.cuda.synchronize()
 
 
-__all__ = ["initialize", "move_to_device", "reduce_loss", "synchronize"]
+def reduce_statistics(
+    values: Mapping[str, float], *, reduction: str = "sum", dtype: str = "float32"
+) -> dict[str, float]:
+    """Reduce detached optimizer-step totals across the runtime's FSDP group."""
+    if reduction not in {"sum", "max"}:
+        raise ValueError("statistics reduction must be 'sum' or 'max'")
+    if dtype not in {"float32", "float64"}:
+        raise ValueError("statistics dtype must be 'float32' or 'float64'")
+    if not values:
+        return {}
+    names = sorted(values)
+    if not dist.is_initialized():
+        return {name: float(values[name]) for name in names}
+    state = get_parallel_state()
+    tensor = torch.tensor([values[name] for name in names], dtype=getattr(torch, dtype), device="cuda")
+    operation = dist.ReduceOp.SUM if reduction == "sum" else dist.ReduceOp.MAX
+    dist.all_reduce(tensor, op=operation, group=state.fsdp_group)
+    return dict(zip(names, tensor.cpu().tolist(), strict=True))
+
+
+__all__ = ["initialize", "move_to_device", "reduce_loss", "reduce_statistics", "synchronize"]

@@ -8,6 +8,8 @@ from dfactory.config import DistributedConfig, ModelConfig, OptimizationConfig
 from dfactory.runtime import RuntimeContext
 from dfactory.runtime.veomni import checkpoint, distributed, optimization, parallel
 
+_DEFAULT_WEIGHTS = object()
+
 
 class VeOmniGateway:
     def initialize(self, config: DistributedConfig, *, seed: int) -> RuntimeContext:
@@ -20,8 +22,15 @@ class VeOmniGateway:
         distributed_config: DistributedConfig,
         *,
         sharding_plan: Any = None,
+        weights_path: Any = _DEFAULT_WEIGHTS,
+        strict: bool | None = None,
     ) -> Any:
-        return parallel.parallelize(model, model_config, distributed_config, sharding_plan=sharding_plan)
+        options: dict[str, Any] = {"sharding_plan": sharding_plan}
+        if weights_path is not _DEFAULT_WEIGHTS:
+            options["weights_path"] = weights_path
+        if strict is not None:
+            options["strict"] = strict
+        return parallel.parallelize(model, model_config, distributed_config, **options)
 
     def activation_contexts(self, config: DistributedConfig) -> tuple[Any, Any]:
         return parallel.activation_contexts(config)
@@ -37,6 +46,9 @@ class VeOmniGateway:
 
     def reduce_loss(self, loss: Any, token_count: Any) -> Any:
         return distributed.reduce_loss(loss, token_count)
+
+    def reduce_statistics(self, values: Any, *, reduction: str = "sum", dtype: str = "float32") -> dict[str, float]:
+        return distributed.reduce_statistics(values, reduction=reduction, dtype=dtype)
 
     def synchronize(self) -> None:
         distributed.synchronize()

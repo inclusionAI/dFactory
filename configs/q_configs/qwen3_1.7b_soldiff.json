@@ -1,0 +1,58 @@
+{
+  "format": "mask_generator_q_linear.init.v1",
+  "architectures": [
+    "MaskGeneratorQLinearForOrdering"
+  ],
+  "model_type": "mask_generator_q_linear",
+  "base_model_type": "qwen3",
+  "base_architectures": [
+    "Qwen3ForBDLM"
+  ],
+  "base_config": {
+    "architectures": [
+      "Qwen3ForBDLM"
+    ],
+    "attention_bias": false,
+    "attention_dropout": 0.0,
+    "bos_token_id": 151643,
+    "eos_token_id": 151643,
+    "head_dim": 128,
+    "hidden_act": "silu",
+    "hidden_size": 2048,
+    "initializer_range": 0.02,
+    "intermediate_size": 6144,
+    "max_position_embeddings": 32768,
+    "max_window_layers": 28,
+    "model_type": "qwen3",
+    "num_attention_heads": 16,
+    "num_hidden_layers": 14,
+    "num_key_value_heads": 8,
+    "rms_norm_eps": 1e-06,
+    "rope_scaling": null,
+    "rope_theta": 1000000,
+    "sliding_window": null,
+    "tie_word_embeddings": true,
+    "torch_dtype": "bfloat16",
+    "transformers_version": "4.51.0",
+    "use_cache": true,
+    "use_sliding_window": false,
+    "vocab_size": 151936,
+    "pad_token_id": null
+  },
+  "encoder_num_layers": 14,
+  "hidden_size": 2048,
+  "q_head_type": "linear",
+  "q_score_bias": false,
+  "rms_eps": 1e-06,
+  "attention_block_size": 32,
+  "attention_mask_type": "doc_causal_block",
+  "attn_implementation": "flex_attention",
+  "eos_token_id": 151645,
+  "eos_token_id_source": "tokenizer.eos_token_id",
+  "tokenizer_eos_token": "<|im_end|>",
+  "contains_lm_head": false,
+  "tie_word_embeddings": false,
+  "frozen_encoder": false,
+  "trainable_encoder": true,
+  "self_contained_package": true
+}
