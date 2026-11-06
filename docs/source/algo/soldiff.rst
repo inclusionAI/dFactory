@@ -8,6 +8,14 @@ from masked states. The learned-order loss ``L_LO`` is supplemented by
 rank-weighted reconstruction ``L_rec`` and suffix-order ``L_ord`` losses to
 support parallel decoding. Generation uses the main model and p head only.
 
+Models
+------
+
+* `SolDiff-8B-Base <https://huggingface.co/GSAI-ML/SolDiff-8B-Base>`_:
+  base model for text completion.
+* `SolDiff-8B-Instruct <https://huggingface.co/GSAI-ML/SolDiff-8B-Instruct>`_:
+  instruction-tuned model for instruction following and chat.
+
 Training
 --------
 
@@ -111,7 +119,7 @@ VeOmni. q is not needed for generation.
    import torch
    from transformers import AutoModelForCausalLM, AutoTokenizer
 
-   path = "/path/to/hf_ckpt"
+   path = "GSAI-ML/SolDiff-8B-Base"
    model = AutoModelForCausalLM.from_pretrained(
        path, trust_remote_code=True, dtype=torch.bfloat16,
        attn_implementation="sdpa",
