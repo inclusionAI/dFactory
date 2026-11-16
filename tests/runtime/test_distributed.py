@@ -184,3 +184,27 @@ def test_initialize_rejects_process_group_world_size_mismatch(monkeypatch) -> No
         distributed_module.initialize(DistributedConfig(dp=2), seed=42)
 
     init_parallel_state.assert_not_called()
+
+
+def test_statistics_preserves_float64_scalar_precision(monkeypatch):
+    make_tensor = torch.tensor
+    seen = []
+
+    def cpu_tensor(data, *, dtype, device):
+        seen.append((dtype, device))
+        return make_tensor(data, dtype=dtype)
+
+    monkeypatch.setattr(distributed_module.torch, "tensor", cpu_tensor)
+    monkeypatch.setattr(distributed_module.dist, "is_initialized", lambda: True)
+    monkeypatch.setattr(distributed_module, "get_parallel_state", lambda: SimpleNamespace(fsdp_group="fsdp"))
+
+    def reduce(tensor, *, op, group):
+        assert op == distributed_module.dist.ReduceOp.SUM
+        assert group == "fsdp"
+        tensor.mul_(2)
+
+    monkeypatch.setattr(distributed_module.dist, "all_reduce", reduce)
+    count = float(2**25 + 1)
+    values = distributed_module.reduce_statistics({"tokens": count}, dtype="float64")
+    assert values == {"tokens": count * 2}
+    assert seen == [(torch.float64, "cuda")]

@@ -20,6 +20,7 @@ def test_recipe_list_contains_builtin_recipes(capsys: pytest.CaptureFixture[str]
         "estf",
         "mtf",
         "sft",
+        "soldiff",
     ]
 
 
@@ -28,6 +29,6 @@ def test_dataset_list_contains_builtins(capsys: pytest.CaptureFixture[str]) -> N
     assert capsys.readouterr().out.splitlines() == ["hf_dataset", "jsonl"]
 
 
-def test_model_list_contains_llada2(capsys: pytest.CaptureFixture[str]) -> None:
+def test_model_list_contains_builtin_models(capsys: pytest.CaptureFixture[str]) -> None:
     assert main(["models", "list"]) == 0
-    assert capsys.readouterr().out.splitlines() == ["llada2"]
+    assert capsys.readouterr().out.splitlines() == ["llada2", "qwen3"]

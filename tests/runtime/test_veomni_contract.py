@@ -31,3 +31,21 @@ def test_provider_parallel_policy_is_exposed_through_the_model(monkeypatch) -> N
     assert result is model
     assert model.get_parallel_plan() is policy
     assert "sharding_plan" not in build_parallelize_model.call_args.kwargs
+
+
+def test_auxiliary_parallel_initialization_does_not_load_main_weights(monkeypatch) -> None:
+    model = type("AuxiliaryModel", (), {"_no_split_modules": ["Decoder"]})()
+    build_parallelize_model = Mock(return_value=model)
+    monkeypatch.setattr(parallel_module, "build_parallelize_model", build_parallelize_model)
+    gateway = VeOmniGateway()
+    result = gateway.parallelize(
+        model,
+        ModelConfig(weights_path="main-weights"),
+        DistributedConfig(),
+        weights_path=None,
+        strict=False,
+    )
+    assert result is model
+    assert build_parallelize_model.call_args.kwargs["weights_path"] is None
+    assert build_parallelize_model.call_args.kwargs["strict"] is False
+    assert build_parallelize_model.call_args.kwargs["basic_modules"] == ["Decoder"]

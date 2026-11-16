@@ -1,0 +1,72 @@
+# Set model/data paths and choose the step budget for the intended training run.
+run:
+  output_dir: outputs/qwen3-1.7b-soldiff
+  seed: 42
+  max_steps: 1000
+  num_train_epochs: 1
+
+recipe:
+  name: soldiff
+  params:
+    block_size: 32
+    q_config_path: configs/q_configs/qwen3_1.7b_soldiff.json
+    p_head_config_path: configs/p_head_configs/qwen3_1.7b.json
+    loss_backward_divisor: 4096.0
+    suffix_reconstruction_tau: 8.0
+    lambda_align: 1.0
+    lambda_recon: 1.0
+    diagnostics_every_steps: 100
+
+model:
+  provider: qwen3
+  config_path: configs/model_configs/qwen3_1.7b
+  weights_path: /path/to/main-model
+  tokenizer_path: configs/tokenizer/qwen3_tokenizer
+  attention: flex_attention
+  moe: eager
+  init_device: meta
+  mask_token_id: 151669
+  # Document boundaries use the tokenizer EOS, which differs from the native model config.
+  eos_token_id: 151645
+  pad_token_id: 151643
+
+data:
+  source: jsonl
+  path: /path/to/token-documents.jsonl
+  format: token_records
+  text_key: input_ids
+  max_seq_len: 4096
+  packing: false
+  num_workers: 16
+
+distributed:
+  mode: fsdp2
+  dp: 8
+  dp_replicate: 1
+  ep: 1
+  activation_offload: false
+  gradient_checkpointing: true
+
+optimization:
+  optimizer: adamw
+  lr: 2.0e-5
+  beta1: 0.9
+  beta2: 0.95
+  weight_decay: 0.1
+  scheduler: constant
+  warmup_ratio: 0.0
+  decay_ratio: 1.0
+  min_lr: 2.0e-5
+  global_batch_size: 1024
+  micro_batch_size: 4
+  max_grad_norm: 0.1
+
+checkpoint:
+  resume_from: null
+  save_every_steps: 1000
+  save_every_epochs: 1
+  save_hf_weights: false
+
+logging:
+  report_to: [stdout]
+  log_every_steps: 1

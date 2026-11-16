@@ -9,8 +9,8 @@
 
 dFactory is an extensible training framework for discrete diffusion language
 models. It provides SFT, autoregressive SFT, multi-stage fine-tuning, and
-continued-pretraining recipes for the LLaDA2 family, with PyTorch FSDP2 and
-VeOmni providing the distributed runtime.
+continued-pretraining recipes for the LLaDA2 family, plus SolDiff pretraining
+for Qwen3, with PyTorch FSDP2 and VeOmni providing the distributed runtime.
 
 dFactory owns its model, data, recipe, checkpoint, and configuration semantics.
 VeOmni is an installed dependency, not a source submodule and not part of the
@@ -123,6 +123,8 @@ The same launcher directly supports every checked-in training profile:
 | EMTF random-T2T | `configs/recipes/emtf_random_t2t/llada2_mini.yaml` |
 | AR2BD continued pretraining | `configs/recipes/ar2bd/llada2_mini.yaml` |
 | ESTF continued pretraining | `configs/recipes/estf/llada2_mini.yaml` |
+| [SolDiff](docs/source/algo/soldiff.rst) 1.7B continued pretraining | `configs/recipes/soldiff/qwen3_1.7b.yaml` |
+| [SolDiff](docs/source/algo/soldiff.rst) 8B continued pretraining | `configs/recipes/soldiff/qwen3_8b.yaml` |
 
 To resume, use the same command with
 `--set checkpoint.resume_from=/path/to/checkpoints/global_step_N`.
